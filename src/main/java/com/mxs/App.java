@@ -6,6 +6,7 @@ package com.mxs;
  */
 public class App 
 {
+    // Testing pre-push git hook
     public static void main( String[] args )
     {
         System.out.println( "Hello World!" );
