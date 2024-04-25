@@ -6,8 +6,7 @@ package com.mxs;
  */
 public class App 
 {
-    // TODO: won't be pushed to main branch
-    // Testing pre-push git hook
+    // Testing pre-push git hook (no T.O.D.O.s in comments)
     public static void main( String[] args )
     {
         System.out.println( "Hello World!" );
