@@ -6,6 +6,7 @@ package com.mxs;
  */
 public class App 
 {
+    // TODO: won't be pushed to main branch
     // Testing pre-push git hook
     public static void main( String[] args )
     {
