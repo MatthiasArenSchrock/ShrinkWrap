@@ -1,12 +1,12 @@
 package DataStructures;
 
 /*
- * Program     : Node
+ * Program     : TrieNode
  * Description : Node object for Trie implementation
  * Author      : Matthias Schrock
  * Date        : 04-25-2024
  * Course      : CS375 Software Engineering II
- * Compile     : javac Node.java
+ * Compile     : javac TrieNode.java
  * Execute     : N/A
  */
 
