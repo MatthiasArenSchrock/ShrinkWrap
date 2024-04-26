@@ -23,13 +23,13 @@ import java.nio.file.StandardOpenOption;
 import static org.junit.Assert.*;
 
 public class BinTest {
+    private Path testFile;
     private Bin bin;
-    private Path dir, testFile;
     private static final String BLEE = "Blee\nBlah\nBlue";
 
     @Before
     public void setUp() throws IOException {
-        dir = Paths.get("src", "test", "resource");
+        Path dir = Paths.get("src", "test", "resource", "IO");
         Files.createDirectories(dir);
 
         testFile = dir.resolve("Blee.txt");
@@ -67,6 +67,16 @@ public class BinTest {
         while(!bin.isEmpty()) {
             assertEquals(BLEE.charAt(i++), bin.readChar());
         }
+        bin.close();
+
+        // Test offset
+        // File contains "Blee" = 01000010 01101100 01100101 01100101
+        // throwing away the first bit, we expect 10000100 = 132
+        setUp();
+        bin.readBit();
+        int expected = BLEE.charAt(0);
+        expected <<= 1;
+        assertEquals((char) expected, bin.readChar());
     }
 
     @Test(expected = IOException.class)
@@ -95,6 +105,16 @@ public class BinTest {
         while(!bin.isEmpty()) {
             assertEquals((int) BLEE.charAt(i++), bin.readInt(8));
         }
+    }
+
+    @Test
+    public void testReadOptimalRbitInt() throws IOException {
+        int expected = 0;
+        for (int i = 0; i < 4; i++) {
+            expected <<= 8;
+            expected |= BLEE.toCharArray()[i];
+        }
+        assertEquals(expected, bin.readInt(32));
     }
 
     @Test(expected = IllegalArgumentException.class)

@@ -15,6 +15,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -25,12 +26,12 @@ import static org.junit.Assert.assertNotNull;
 
 public class BoutTest {
     private Bout bout;
-    private Path dir, testFile;
+    private Path testFile;
     private static final String BLEE = "Blee\nBlah\nBlue";
 
     @Before
     public void setUp() throws IOException {
-        dir = Paths.get("src", "test", "resource");
+        Path dir = Paths.get("src", "test", "resource", "IO");
         Files.createDirectories(dir);
 
         testFile = dir.resolve("Blee.txt");
@@ -67,6 +68,18 @@ public class BoutTest {
         bout.close();
 
         testContent(BLEE);
+
+        // Test offset
+        // ASCII: 'a' = 97 = 01100001
+        // bout writes (00110000 = '0' = 48) + 1
+        setUp();
+        bout.writeBit(false);
+        bout.writeByte(97);
+        bout.close();
+
+        try (InputStream is = Files.newInputStream(testFile)) {
+            assertEquals(48, is.read());
+        }
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -124,6 +137,14 @@ public class BoutTest {
         bout.close();
 
         testContent(BLEE);
+    }
+
+    @Test
+    public void testWriteOptimalRbitInt() throws IOException {
+        bout.write(808464432, 32);
+        bout.close();
+
+        testContent("0000");
     }
 
     @Test(expected = IllegalArgumentException.class)

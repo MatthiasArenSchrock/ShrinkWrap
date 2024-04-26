@@ -124,6 +124,7 @@ public class Bout implements AutoCloseable {
     public void write(int x, int r) throws IOException {
         if (r == 32) {
             write(x);
+            return;
         }
         if (r < 1 || r > 32) {
             throw new IllegalArgumentException("Illegal value for r = " + r);
@@ -139,20 +140,11 @@ public class Bout implements AutoCloseable {
     }
 
     /**
-     * TODO: Trying something new here
      * Write 64-bit long to output stream
      * @param l the long to write
      * @throws IOException if an I/O error occurs
      */
     public void write(long l) throws IOException {
-//        writeByte((int) ((l >>> 56) & 0xff));
-//        writeByte((int) ((l >>> 48) & 0xff));
-//        writeByte((int) ((l >>> 40) & 0xff));
-//        writeByte((int) ((l >>> 32) & 0xff));
-//        writeByte((int) ((l >>> 24) & 0xff));
-//        writeByte((int) ((l >>> 16) & 0xff));
-//        writeByte((int) ((l >>> 8) & 0xff));
-//        writeByte((int) ((l >>> 0) & 0xff));
         write((int) (l >>> 32));
         write((int) l);
     }
