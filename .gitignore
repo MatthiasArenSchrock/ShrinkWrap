@@ -20,3 +20,5 @@ test2.txt
 *.hh
 *.ll
 *.zl
+/src/test/resource
+
