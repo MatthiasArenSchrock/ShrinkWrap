@@ -17,6 +17,6 @@ buildNumber.properties
 .classpath
 test1.txt
 test2.txt
-.hh
-.ll
-.zl
+*.hh
+*.ll
+*.zl
