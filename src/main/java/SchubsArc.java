@@ -8,6 +8,9 @@
  * Execute     : java SchubsArc <archive-name>.zl <file1> <[file2] [file3] ...>
  */
 
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor
 public class SchubsArc {
     public static void main(String[] args) {
 

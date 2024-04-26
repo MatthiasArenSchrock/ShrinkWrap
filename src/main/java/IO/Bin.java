@@ -11,7 +11,6 @@ package IO;
  */
 
 import java.io.BufferedInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -70,18 +69,26 @@ public class Bin implements AutoCloseable {
     }
 
     /**
+     * Read a string from the input stream
+     * @return string value
+     * @throws IOException if an I/O error occurs
+     */
+    public String readString() throws IOException {
+        StringBuilder sb = new StringBuilder();
+        while (!isEmpty()) {
+            sb.append(readChar());
+        }
+
+        return sb.toString();
+    }
+
+    /**
      * Read all bytes from the input stream
      * @return byte array
      * @throws IOException if an I/O error occurs
      */
     public byte[] readAllBytes() throws IOException {
-        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-        while (!isEmpty()) {
-            buffer.write(readChar());
-        }
-
-        buffer.flush();
-        return buffer.toByteArray();
+        return readString().getBytes();
     }
 
     /**
@@ -119,6 +126,34 @@ public class Bin implements AutoCloseable {
         for (int i = 0; i < 4; i++) {
             x <<= BYTE_SIZE;
             x |= readChar();
+        }
+
+        return x;
+    }
+
+    /**
+     * Read r bits from input stream and return as an integer
+     * @param r number of bits to read
+     * @return integer value
+     * @throws IOException if an I/O error occurs
+     * @throws IllegalArgumentException if r is not between 1 and 32
+     */
+    public int readInt(int r) throws IOException {
+        if (r < 1 || r > 32) {
+            throw new IllegalArgumentException("Illegal value for r = " + r);
+        }
+
+        if (r == 32) {
+            return readInt();
+        }
+
+        int x = 0;
+        for (int i = 0; i < r; i++) {
+            x <<= 1;
+            boolean bit = readBit();
+            if (bit) {
+                x |= 1;
+            }
         }
 
         return x;

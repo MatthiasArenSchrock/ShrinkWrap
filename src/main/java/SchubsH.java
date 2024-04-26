@@ -9,13 +9,19 @@
     *            GLOB CLI: java SchubsH <GLOB>
  */
 
-import DataStructures.Node;
+import DataStructures.TrieNode;
 import IO.Bin;
 import IO.Bout;
+import lombok.NoArgsConstructor;
 
 import java.io.IOException;
 import java.util.PriorityQueue;
 
+/**
+ * Compress one to many files using Huffman encoding
+ * @author Matthias Schrock
+ */
+@NoArgsConstructor
 public class SchubsH {
     private static final int R = 256;
 
@@ -30,11 +36,11 @@ public class SchubsH {
             byte[] input = bin.readAllBytes();
 
             int[] freq = new int[R];
-            for (int i = 0; i < input.length; i++) {
-                freq[input[i]]++;
+            for (byte value : input) {
+                freq[value]++;
             }
 
-            Node root = buildTrie(freq);
+            TrieNode root = buildTrie(freq);
 
             String[] ct = new String[R];
             buildCode(ct, root, "");
@@ -56,18 +62,18 @@ public class SchubsH {
      * @param freq frequency array
      * @return root of the trie
      */
-    private Node buildTrie(int[] freq) {
-        PriorityQueue<Node> pq = new PriorityQueue<>();
+    private TrieNode buildTrie(int[] freq) {
+        PriorityQueue<TrieNode> pq = new PriorityQueue<>();
         for (char c = 0; c < R; c++) {
             if (freq[c] > 0) {
-                pq.add(new Node(c, freq[c], null, null));
+                pq.add(new TrieNode(c, freq[c], null, null));
             }
         }
 
         while (pq.size() > 1) {
-            Node left = pq.poll();
-            Node right = pq.poll();
-            Node parent = new Node('\0', left.getFreq() + right.getFreq(), left, right);
+            TrieNode left = pq.poll();
+            TrieNode right = pq.poll();
+            TrieNode parent = new TrieNode('\0', left.freq() + right.freq(), left, right);
             pq.add(parent);
         }
 
@@ -80,16 +86,16 @@ public class SchubsH {
      * @param bout output stream
      * @throws IOException if an I/O error occurs
      */
-    private void writeTrie(Node n, Bout bout) throws IOException {
+    private void writeTrie(TrieNode n, Bout bout) throws IOException {
         if (n.isLeaf()) {
             bout.writeBit(true);
-            bout.write(n.getCh());
+            bout.write(n.ch());
             return;
         }
         bout.writeBit(false);
 
-        writeTrie(n.getLeft(), bout);
-        writeTrie(n.getRight(), bout);
+        writeTrie(n.left(), bout);
+        writeTrie(n.right(), bout);
     }
 
     /**
@@ -98,28 +104,24 @@ public class SchubsH {
      * @param n node of the trie
      * @param s bitstring
      */
-    private void buildCode(String[] ct, Node n, String s) {
+    private void buildCode(String[] ct, TrieNode n, String s) {
         if (!n.isLeaf()) {
-            buildCode(ct, n.getLeft(), s + '0');
-            buildCode(ct, n.getRight(), s + '1');
+            buildCode(ct, n.left(), s + '0');
+            buildCode(ct, n.right(), s + '1');
         } else {
-            ct[n.getCh()] = s;
+            ct[n.ch()] = s;
         }
     }
 
     public static void main(String[] args) throws IOException {
         args = new String[] { "test1.txt", "test2.txt" }; // For testing
-        validateInput(args);
+        if (args.length < 1) {
+            throw new IllegalArgumentException("Usage: java SchubsH <filename> | <GLOB>");
+        }
 
         SchubsH sh = new SchubsH();
         for (String arg : args) {
             sh.compress(arg);
-        }
-    }
-
-    private static void validateInput(String[] args) {
-        if (args.length < 1) {
-            throw new RuntimeException("Usage: java SchubsH <filename> | <GLOB>");
         }
     }
 }

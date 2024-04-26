@@ -13,7 +13,6 @@ package IO;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**
@@ -37,18 +36,6 @@ public class Bout implements AutoCloseable {
      */
     public Bout(String s) throws IOException {
         bos = new BufferedOutputStream(Files.newOutputStream(Paths.get(s)));
-        buf = 0;
-        n = 0;
-    }
-
-    /**
-     * TODO: is this going to be useful?
-     * Create a binary writer from a file path
-     * @param p file path
-     * @throws IOException if an I/O error occurs
-     */
-    public Bout(Path p) throws IOException {
-        bos = new BufferedOutputStream(Files.newOutputStream(p));
         buf = 0;
         n = 0;
     }
@@ -106,6 +93,17 @@ public class Bout implements AutoCloseable {
     }
 
     /**
+     * Write a string to the output stream
+     * @param s the string to write
+     * @throws IOException if an I/O error occurs
+     */
+    public void write(String s) throws IOException {
+        for (char c : s.toCharArray()) {
+            write(c);
+        }
+    }
+
+    /**
      * Write 32-bit int to the output stream
      * @param x the integer to write
      * @throws IOException if an I/O error occurs
@@ -115,6 +113,29 @@ public class Bout implements AutoCloseable {
         writeByte((x >>> 16) & 0xff);
         writeByte((x >>> 8) & 0xff);
         writeByte((x) & 0xff);
+    }
+
+    /**
+     * Write r-bit int to the output stream
+     * @param x the integer to write
+     * @param r the number of relevant bits in the integer
+     * @throws IOException if an I/O error occurs
+     */
+    public void write(int x, int r) throws IOException {
+        if (r == 32) {
+            write(x);
+        }
+        if (r < 1 || r > 32) {
+            throw new IllegalArgumentException("Illegal value for r = " + r);
+        }
+        if (x < 0 || x >= (1 << r)) {
+            throw new IllegalArgumentException("Illegal " + r + "-bit char: " + x);
+        }
+
+        for (int i = 0; i < r; i++) {
+            boolean bit = ((x >>> (r - i - 1)) & 1) == 1;
+            writeBit(bit);
+        }
     }
 
     /**
