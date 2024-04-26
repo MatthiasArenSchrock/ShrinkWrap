@@ -11,6 +11,7 @@ package IO;
  */
 
 import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -69,6 +70,21 @@ public class Bin implements AutoCloseable {
     }
 
     /**
+     * Read all bytes from the input stream
+     * @return byte array
+     * @throws IOException if an I/O error occurs
+     */
+    public byte[] readAllBytes() throws IOException {
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        while (!isEmpty()) {
+            buffer.write(readChar());
+        }
+
+        buffer.flush();
+        return buffer.toByteArray();
+    }
+
+    /**
      * Read a byte from the input stream
      * @return byte value
      * @throws IOException if an I/O error occurs
@@ -77,7 +93,7 @@ public class Bin implements AutoCloseable {
         checkEmpty();
 
         int x = buf;
-        if (n == 0) {
+        if (n == 8) {
             fill();
             return (char) (x & 0xff);
         }
