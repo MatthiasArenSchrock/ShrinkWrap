@@ -140,6 +140,22 @@ public class Bin implements AutoCloseable {
     }
 
     /**
+     * Read a bit/boolean from the input stream
+     * @return bit/boolean value
+     * @throws IOException if an I/O error occurs
+     */
+    public boolean readBit() throws IOException {
+        checkEmpty();
+        n--;
+        boolean bit = ((buf >> n) & 1) == 1;
+        if (n == 0) {
+            fill();
+        }
+
+        return bit;
+    }
+
+    /**
      * Close the input stream
      * @throws IOException if an I/O error occurs
      */

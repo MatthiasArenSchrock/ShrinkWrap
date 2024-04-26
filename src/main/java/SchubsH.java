@@ -25,10 +25,8 @@ public class SchubsH {
      * @throws IOException if an I/O error occurs
      */
     public void compress(String fnm) throws IOException {
-
-
         try (Bin bin = new Bin(fnm);
-             Bout bout = new Bout(fnm.substring(0, fnm.lastIndexOf('.')) + ".hh")) {
+             Bout bout = new Bout(fnm + ".hh")) {
             byte[] input = bin.readAllBytes();
 
             int[] freq = new int[R];
@@ -109,26 +107,13 @@ public class SchubsH {
         }
     }
 
-    /**
-     * Compress multiple files for glob
-     * @param fnms file names
-     * @throws IOException if an I/O error occurs
-     */
-    private void compressFiles(String[] fnms) throws IOException {
-        for (String fnm : fnms) {
-            compress(fnm);
-        }
-    }
-
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         args = new String[] { "test1.txt", "test2.txt" }; // For testing
         validateInput(args);
 
-        try {
-            SchubsH sh = new SchubsH();
-            sh.compressFiles(args);
-        } catch (IOException e) {
-            e.printStackTrace();
+        SchubsH sh = new SchubsH();
+        for (String arg : args) {
+            sh.compress(arg);
         }
     }
 
