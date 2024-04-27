@@ -12,10 +12,7 @@ import IO.Bin;
 import IO.Bout;
 import lombok.NoArgsConstructor;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -32,7 +29,7 @@ public class SchubsArc {
     public void compress(String achv, String[] fnms) throws IOException {
         SchubsL schubsL = new SchubsL();
         try (ByteArrayOutputStream tarCont = tar(fnms)) {
-            //TODO: Currently throwing illegal key on tar string
+            String test = tarCont.toString();
             schubsL.compress(achv, new ByteArrayInputStream(tarCont.toByteArray()));
         }
     }
@@ -76,7 +73,7 @@ public class SchubsArc {
      * @throws IOException if an I/O error occurs
      */
     private void archive(String[] fnms, Bout bout) throws IOException {
-        char sep = (char) 255;
+//        char sep = (char) 255;
 
         for (String fnm : fnms) {
             Path filePath = Path.of(fnm);
@@ -85,17 +82,17 @@ public class SchubsArc {
             }
 
             bout.write(fnm.length());
-            bout.write(sep);
+//            bout.write(sep);
             bout.write(fnm);
-            bout.write(sep);
+//            bout.write(sep);
             bout.write(Files.size(filePath));
-            bout.write(sep);
+//            bout.write(sep);
 
             copy(fnm, bout);
 
-            if (!fnm.equals(fnms[fnms.length - 1])) {
-                bout.write(sep);
-            }
+//            if (!fnm.equals(fnms[fnms.length - 1])) {
+//                bout.write(sep);
+//            }
         }
     }
 
@@ -124,6 +121,9 @@ public class SchubsArc {
 //            throw new FileAlreadyExistsException("Archive already exists: " + args[0]);
 //        }
         for (String fnm : Arrays.copyOfRange(args, 1, args.length)) {
+            if (!Files.exists(Path.of(fnm))) {
+                throw new FileNotFoundException("File not found: " + fnm);
+            }
             if (Files.isDirectory(Path.of(fnm))) {
                 throw new IOException(fnm + " is a directory. Use glob instead: " + fnm +
                         File.separator + "*<extension>");

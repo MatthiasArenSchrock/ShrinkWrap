@@ -87,6 +87,7 @@ public class SchubsL {
 
         while (!input.isEmpty()) {
             String s = st.longestPrefix(input);
+            if (s.isEmpty()) s = Character.toString('\0');
             bout.write(st.get(s), W);
             int t = s.length();
             if (t < input.length() && code < L) {
