@@ -14,7 +14,11 @@ import IO.Bin;
 import IO.Bout;
 import lombok.NoArgsConstructor;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Optional;
 import java.util.PriorityQueue;
 
@@ -119,6 +123,14 @@ public class SchubsH {
 //        args = new String[] { "test1.txt", "test2.txt" }; // For testing
         if (args.length < 1) {
             throw new IllegalArgumentException("Usage: java SchubsH <filename> | <GLOB>");
+        }
+
+        if (Files.exists(Path.of(args[0] + ".hh"))) {
+            throw new FileAlreadyExistsException("File already exists: " + args[0] + ".hh");
+        }
+        if (Files.isDirectory(Path.of(args[0]))) {
+            throw new IllegalArgumentException("Input file is a directory. Use Glob instead: " +
+                    "java SchubsH " + args[0] + File.separator + "*<extension>");
         }
 
         SchubsH sh = new SchubsH();

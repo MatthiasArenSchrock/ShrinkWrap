@@ -87,7 +87,7 @@ public class Deschubs {
             int codeword = bin.readInt(SchubsL.getW());
             String val = st[codeword];
 
-            while (true) {
+            while (!bin.isEmpty()) {
                 bout.write(val);
 
                 codeword = bin.readInt(SchubsL.getW());
@@ -131,7 +131,7 @@ public class Deschubs {
 //        args = new String[] { "test1.txt.ll", "test2.txt.ll" }; // for testing
 //        args = new String[] { "test1.txt.hh", "test2.txt.hh" }; // for testing
         if (args.length < 1) {
-            throw new RuntimeException("Usage: java Deschubs <filename>.hh|ll|zl | <GLOB>");
+            throw new IllegalArgumentException("Usage: java Deschubs <filename>.hh|ll|zl | <GLOB>");
         }
 
         Deschubs deschubs = new Deschubs();

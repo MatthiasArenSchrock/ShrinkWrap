@@ -12,6 +12,7 @@ package IO;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -26,7 +27,7 @@ import java.nio.file.Paths;
  */
 public class Bin implements AutoCloseable {
     private static final int BYTE_SIZE = 8;
-    private BufferedInputStream bis;
+    private InputStream bis;
     private int buf;
     private int n;
 
@@ -39,6 +40,16 @@ public class Bin implements AutoCloseable {
         Path path = Paths.get(s);
         bis = new BufferedInputStream(Files.newInputStream(path));
         fill();
+    }
+
+    /**
+     * Create a binary reader from an input stream
+     * @param is the input stream
+     */
+    public Bin(InputStream is) {
+        bis = is;
+        buf = 0;
+        n = 0;
     }
 
     /**
@@ -109,10 +120,10 @@ public class Bin implements AutoCloseable {
         int oldN = n;
         fill();
 
-        checkEmpty();
-
-        n = oldN;
-        x |= buf >>> n;
+        if (!isEmpty()) {
+            n = oldN;
+            x |= buf >>> n;
+        }
         return (char) (x & 0xff);
     }
 

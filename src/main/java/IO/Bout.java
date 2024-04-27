@@ -11,7 +11,9 @@ package IO;
  */
 
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -25,7 +27,7 @@ import java.nio.file.Paths;
  */
 public class Bout implements AutoCloseable {
     private static final int BYTE_SIZE = 8;
-    private BufferedOutputStream bos;
+    private final OutputStream bos;
     private int buf;
     private int n;
 
@@ -36,6 +38,16 @@ public class Bout implements AutoCloseable {
      */
     public Bout(String s) throws IOException {
         bos = new BufferedOutputStream(Files.newOutputStream(Paths.get(s)));
+        buf = 0;
+        n = 0;
+    }
+
+    /**
+     * Create a binary writer from a buffered output stream
+     * @param baos the buffered output stream
+     */
+    public Bout(ByteArrayOutputStream baos) {
+        this.bos = baos;
         buf = 0;
         n = 0;
     }
