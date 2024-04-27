@@ -15,10 +15,8 @@ buildNumber.properties
 .project
 # JDT-specific (Eclipse Java Development Tools)
 .classpath
-test1.txt
-test2.txt
+test*.txt
 *.hh
 *.ll
 *.zl
-/src/test/resource
-
+/src/test/resource/**
