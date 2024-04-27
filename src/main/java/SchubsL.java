@@ -72,7 +72,7 @@ public class SchubsL {
     }
 
     public static void main(String[] args) throws IOException {
-        args = new String[] { "test1.txt", "test2.txt" };
+//        args = new String[] { "test1.txt", "test2.txt" };
         if (args.length == 0) {
             throw new IllegalArgumentException("Usage: java SchubsL <filename> | <GLOB>");
         }

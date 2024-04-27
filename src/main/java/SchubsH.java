@@ -15,6 +15,7 @@ import IO.Bout;
 import lombok.NoArgsConstructor;
 
 import java.io.IOException;
+import java.util.Optional;
 import java.util.PriorityQueue;
 
 /**
@@ -40,7 +41,8 @@ public class SchubsH {
                 freq[value]++;
             }
 
-            TrieNode root = buildTrie(freq);
+            TrieNode root = buildTrie(freq)
+                    .orElse(new TrieNode('\0', 0, null, null));
 
             String[] ct = new String[R];
             buildCode(ct, root, "");
@@ -62,7 +64,7 @@ public class SchubsH {
      * @param freq frequency array
      * @return root of the trie
      */
-    private TrieNode buildTrie(int[] freq) {
+    private Optional<TrieNode> buildTrie(int[] freq) {
         PriorityQueue<TrieNode> pq = new PriorityQueue<>();
         for (char c = 0; c < R; c++) {
             if (freq[c] > 0) {
@@ -77,7 +79,7 @@ public class SchubsH {
             pq.add(parent);
         }
 
-        return pq.poll();
+        return Optional.ofNullable(pq.poll());
     }
 
     /**
@@ -114,7 +116,7 @@ public class SchubsH {
     }
 
     public static void main(String[] args) throws IOException {
-        args = new String[] { "test1.txt", "test2.txt" }; // For testing
+//        args = new String[] { "test1.txt", "test2.txt" }; // For testing
         if (args.length < 1) {
             throw new IllegalArgumentException("Usage: java SchubsH <filename> | <GLOB>");
         }

@@ -129,7 +129,7 @@ public class Deschubs {
 
     public static void main(String[] args) throws IOException {
 //        args = new String[] { "test1.txt.ll", "test2.txt.ll" }; // for testing
-        args = new String[] { "test1.txt.hh", "test2.txt.hh" }; // for testing
+//        args = new String[] { "test1.txt.hh", "test2.txt.hh" }; // for testing
         if (args.length < 1) {
             throw new RuntimeException("Usage: java Deschubs <filename>.hh|ll|zl | <GLOB>");
         }
