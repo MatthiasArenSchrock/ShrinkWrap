@@ -14,12 +14,10 @@ import IO.Bin;
 import IO.Bout;
 import lombok.NoArgsConstructor;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 
 /**
  * Decompression class for LZW and Huffman encoded files as well as LZW compressed archives
@@ -145,10 +143,8 @@ public class Deschubs {
         ByteArrayOutputStream tar = new ByteArrayOutputStream();
         deLZW(fnm, tar);
 
-        for(byte b : tar.toByteArray()) {
-            System.out.print((char) b);
-        }
-        try (Bin bin = new Bin(new ByteArrayInputStream(tar.toByteArray()))) {
+        try (Bin bin = new Bin(new ByteArrayInputStream(
+                Arrays.copyOfRange(tar.toByteArray(), 0, tar.size() - 1)))) {
             extract(bin);
         }
     }
@@ -170,22 +166,20 @@ public class Deschubs {
      * @throws IOException if an I/O error occurs
      */
     private void extract(Bin bin) throws IOException {
-        char sep = (char) 255;
-
         while (!bin.isEmpty()) {
             int fnmsz = bin.readInt();
-            sep(bin);
+            char c = bin.readChar();
 
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < fnmsz; i++) {
                 sb.append(bin.readChar());
             }
             String filename = sb.toString();
-            check(filename);
-            sep(bin);
+//            check(filename);
+            bin.readChar();
 
             long filesize = bin.readLong();
-            sep(bin);
+            bin.readChar();
 
             try (Bout out = new Bout(filename)) {
                 for (int i = 0; i < filesize; i++) {
@@ -194,21 +188,9 @@ public class Deschubs {
             }
 
             if (!bin.isEmpty()) {
-                if (bin.readChar() == sep) break;
+                bin.readChar();
             }
         }
-    }
-
-    /**
-     * Read a separator character from the input stream
-     * @param bin input stream
-     * @throws IOException if an I/O error occurs
-     */
-    private void sep(Bin bin) throws IOException {
-        char sep = (char) 255;
-//        if (bin.readChar() != sep) {
-//            throw new RuntimeException("Invalid archive format");
-//        }
     }
 
     /**
