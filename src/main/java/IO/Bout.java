@@ -86,8 +86,7 @@ public class Bout implements AutoCloseable {
         }
 
         for (int i = 0; i < BYTE_SIZE; i++) {
-            boolean bit = ((x >>> (BYTE_SIZE - i - 1)) & 1) == 1;
-            writeBit(bit);
+            writeBit(((x >>> (BYTE_SIZE - i - 1)) & 1) == 1);
         }
     }
 
@@ -146,8 +145,7 @@ public class Bout implements AutoCloseable {
         }
 
         for (int i = 0; i < r; i++) {
-            boolean bit = ((x >>> (r - i - 1)) & 1) == 1;
-            writeBit(bit);
+            writeBit(((x >>> (r - i - 1)) & 1) == 1);
         }
     }
 

@@ -73,7 +73,7 @@ public class SchubsArc {
      * @throws IOException if an I/O error occurs
      */
     private void archive(String[] fnms, Bout bout) throws IOException {
-        char sep = (char) 255;
+        char sep = (char) 127;
 
         for (String fnm : fnms) {
             Path filePath = Path.of(fnm);

@@ -168,18 +168,18 @@ public class Deschubs {
     private void extract(Bin bin) throws IOException {
         while (!bin.isEmpty()) {
             int fnmsz = bin.readInt();
-            char c = bin.readChar();
+            sep(bin);
 
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < fnmsz; i++) {
                 sb.append(bin.readChar());
             }
             String filename = sb.toString();
-//            check(filename);
-            bin.readChar();
+//            check(filename); //TODO
+            sep(bin);
 
             long filesize = bin.readLong();
-            bin.readChar();
+            sep(bin);
 
             try (Bout out = new Bout(filename)) {
                 for (int i = 0; i < filesize; i++) {
@@ -188,9 +188,13 @@ public class Deschubs {
             }
 
             if (!bin.isEmpty()) {
-                bin.readChar();
+                if (!sep(bin)) break;
             }
         }
+    }
+
+    private boolean sep(Bin bin) throws IOException {
+        return bin.readChar() == (char) 127;
     }
 
     /**

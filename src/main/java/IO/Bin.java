@@ -161,8 +161,7 @@ public class Bin implements AutoCloseable {
         int x = 0;
         for (int i = 0; i < r; i++) {
             x <<= 1;
-            boolean bit = readBit();
-            if (bit) {
+            if (readBit()) {
                 x |= 1;
             }
         }
