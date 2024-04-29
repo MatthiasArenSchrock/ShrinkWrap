@@ -10,15 +10,28 @@
 
 import IO.Bin;
 import IO.Bout;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.io.*;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.Arrays;
 
+/**
+ * Create compressed and uncompressed tape archives
+ * @author Matthias Schrock
+ */
 @NoArgsConstructor
 public class SchubsArc {
+    /**
+     * Separator character
+     */
+    @Getter
+    private static final char sep = (char) 127;
+
     /**
      * Compress a set of input files into an LZW table archive
      *
@@ -26,74 +39,52 @@ public class SchubsArc {
      * @param fnms list of files to be included in the archive
      * @throws IOException if an I/O error occurs
      */
-    public void compress(String achv, String[] fnms) throws IOException {
+    public void compress(String achv, String... fnms) throws IOException {
         SchubsL schubsL = new SchubsL();
         try (ByteArrayOutputStream tarCont = tar(fnms)) {
-            String test = tarCont.toString();
             schubsL.compress(achv, new ByteArrayInputStream(tarCont.toByteArray()));
         }
     }
 
     /**
      * Create a tar for compression
+     *
      * @param fnms list of files to be included in the archive
      * @return archived output stream
      * @throws IOException if an I/O error occurs
      */
-    public ByteArrayOutputStream tar(String[] fnms) throws IOException {
+    private ByteArrayOutputStream tar(String[] fnms) throws IOException {
         ByteArrayOutputStream tarCont = new ByteArrayOutputStream();
         try (Bout bout = new Bout(tarCont)) {
-            archive(fnms, bout);
+            for (String fnm : fnms) {
+                Path filePath = Path.of(fnm);
+                if (!Files.exists(filePath)) {
+                    throw new NoSuchFileException(fnm + " does not exist.");
+                }
+                if (!Files.isRegularFile(filePath)) {
+                    if (Files.isDirectory(Path.of(fnm))) {
+                        throw new IOException(fnm + " is a directory. Use glob instead: " + fnm +
+                                File.separator + "*<extension>");
+                    }
+                    throw new IOException("Invalid file " + fnm);
+                }
+
+                bout.write(fnm.length());
+                bout.write(sep);
+                bout.write(fnm);
+                bout.write(sep);
+                bout.write(Files.size(filePath));
+                bout.write(sep);
+
+                copy(fnm, bout);
+
+                if (!fnm.equals(fnms[fnms.length - 1])) {
+                    bout.write(sep);
+                }
+            }
         }
 
         return tarCont;
-    }
-
-    /**
-     * Create an uncompressed tape archive from a set of input files
-     * @param achv name of the archive
-     * @param fnms list of files to be included in the archive
-     * @throws IOException if an I/O error occurs
-     */
-    public void tar(String achv, String[] fnms) throws IOException {
-        Path par = Path.of(achv).getParent();
-        if (par != null) {
-            Files.createDirectories(par);
-        }
-
-        try (Bout bout = new Bout(achv)) {
-            archive(fnms, bout);
-        }
-    }
-
-    /**
-     * Archive a set of files
-     * @param fnms list of files to be included in the archive
-     * @param bout binary output stream
-     * @throws IOException if an I/O error occurs
-     */
-    private void archive(String[] fnms, Bout bout) throws IOException {
-        char sep = (char) 127;
-
-        for (String fnm : fnms) {
-            Path filePath = Path.of(fnm);
-            if (!Files.exists(filePath) || !Files.isRegularFile(filePath)) {
-                throw new IOException("Invalid file " + fnm);
-            }
-
-            bout.write(fnm.length());
-            bout.write(sep);
-            bout.write(fnm);
-            bout.write(sep);
-            bout.write(Files.size(filePath));
-            bout.write(sep);
-
-            copy(fnm, bout);
-
-            if (!fnm.equals(fnms[fnms.length - 1])) {
-                bout.write(sep);
-            }
-        }
     }
 
     /**
@@ -112,24 +103,14 @@ public class SchubsArc {
     }
 
     public static void main(String[] args) throws IOException {
-        args = new String[] { "testArchive.zl", "test1.txt", "test2.txt" };
         if (args.length < 2) {
-            throw new RuntimeException("Usage: java SchubsArc <archive_name>.zl <[file1 file2 ...]>");
+            throw new IllegalArgumentException("Usage: java SchubsArc <archive_name>.zl <[file1 file2 ...]>");
         }
 
-//        if (Files.exists(Path.of(args[0]))) {
-//            throw new FileAlreadyExistsException("Archive already exists: " + args[0]);
-//        }
-        for (String fnm : Arrays.copyOfRange(args, 1, args.length)) {
-            if (!Files.exists(Path.of(fnm))) {
-                throw new FileNotFoundException("File not found: " + fnm);
-            }
-            if (Files.isDirectory(Path.of(fnm))) {
-                throw new IOException(fnm + " is a directory. Use glob instead: " + fnm +
-                        File.separator + "*<extension>");
-            }
+        if (Files.exists(Path.of(args[0]))) {
+            throw new FileAlreadyExistsException("Archive already exists: " + args[0]);
         }
 
-        new SchubsArc().compress(args[0], Arrays.stream(args).skip(1).toArray(String[]::new));
+        new SchubsArc().compress(args[0], Arrays.copyOfRange(args, 1, args.length));
     }
 }

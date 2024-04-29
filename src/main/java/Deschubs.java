@@ -150,17 +150,6 @@ public class Deschubs {
     }
 
     /**
-     * Extract an uncompressed archive
-     * @param fnm file name
-     * @throws IOException if an I/O error occurs
-     */
-    public void untar(String fnm) throws IOException {
-        try (Bin bin = new Bin(fnm)) {
-            extract(bin);
-        }
-    }
-
-    /**
      * Extract files from an un-/de-compressed archive
      * @param bin input stream
      * @throws IOException if an I/O error occurs
@@ -175,7 +164,7 @@ public class Deschubs {
                 sb.append(bin.readChar());
             }
             String filename = sb.toString();
-//            check(filename); //TODO
+            check(filename);
             sep(bin);
 
             long filesize = bin.readLong();
@@ -194,7 +183,7 @@ public class Deschubs {
     }
 
     private boolean sep(Bin bin) throws IOException {
-        return bin.readChar() == (char) 127;
+        return bin.readChar() == SchubsArc.getSep();
     }
 
     /**
@@ -220,7 +209,7 @@ public class Deschubs {
      * @param fnm file name
      * @throws IOException if an I/O error occurs
      */
-    private void decompressLZW(String fnm) throws IOException {
+    private void decompress(String fnm) throws IOException {
         if (fnm.endsWith(".hh")) {
             deHuffman(fnm);
         } else if (fnm.endsWith(".ll")) {
@@ -228,21 +217,18 @@ public class Deschubs {
         } else if (fnm.endsWith(".zl")) {
             unarchive(fnm);
         } else {
-            throw new RuntimeException("Invalid file extension");
+            throw new IllegalArgumentException("Invalid file extension");
         }
     }
 
     public static void main(String[] args) throws IOException {
-//        args = new String[] { "test1.txt.ll", "test2.txt.ll" }; // for testing
-//        args = new String[] { "test1.txt.hh", "test2.txt.hh" }; // for testing
-        args = new String[] { "testArchive.zl" }; // for testing
         if (args.length < 1) {
             throw new IllegalArgumentException("Usage: java Deschubs <filename>.hh|ll|zl | <GLOB>");
         }
 
         Deschubs deschubs = new Deschubs();
         for (String fnm : args) {
-            deschubs.decompressLZW(fnm);
+            deschubs.decompress(fnm);
         }
     }
 }

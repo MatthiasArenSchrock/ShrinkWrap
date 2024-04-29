@@ -63,11 +63,6 @@ public class SchubsLTest {
         checkFileContents(manyThings, manyThingsText.getBytes());
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testLZWWrongNumArgs() throws IOException {
-        SchubsL.main(new String[] {});
-    }
-
     @Test
     public void testLZWGlob() throws IOException {
         Path glob = dir.resolve("glob");
@@ -138,6 +133,11 @@ public class SchubsLTest {
         checkFileContents(uppercaseText, uppercase.getBytes());
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void testLZWWrongNumArgs() throws IOException {
+        SchubsL.main(new String[] {});
+    }
+
     @Test(expected = FileAlreadyExistsException.class)
     public void testLZWFileAlreadyExists() throws IOException {
         Path blank = dir.resolve("Blank.txt");
@@ -145,6 +145,7 @@ public class SchubsLTest {
         SchubsL.main(new String[] { blank.toString() });
     }
 
+    // TODO
     @Test(expected = IllegalArgumentException.class)
     public void testLZWInputFileIsDirectory() throws IOException {
         SchubsL.main(new String[] { dir.toString() });

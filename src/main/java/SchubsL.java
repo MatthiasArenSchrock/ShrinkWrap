@@ -63,6 +63,10 @@ public class SchubsL {
      * @throws IOException if an I/O error occurs
      */
     public void compress(String fnm, InputStream is) throws IOException {
+        if (!fnm.endsWith(".zl")) {
+            fnm += ".zl";
+        }
+
         try (Bin bin = new Bin(is);
              Bout bout = new Bout(fnm)) {
             LZWAlgorithm(bin, bout);
@@ -100,7 +104,6 @@ public class SchubsL {
     }
 
     public static void main(String[] args) throws IOException {
-//        args = new String[] { "test1.txt", "test2.txt" };
         if (args.length == 0) {
             throw new IllegalArgumentException("Usage: java SchubsL <filename> | <GLOB>");
         }
