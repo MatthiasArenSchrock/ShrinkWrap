@@ -106,14 +106,14 @@ public class SchubsArcTest {
     @Test
     public void testArcManyThings() throws IOException {
         String daniel221 = """
-                “It is He who changes the times and the periods;
+                "It is He who changes the times and the periods;
                 He removes kings and appoints kings;
                 He gives wisdom to wise men,
                 and knowledge to people of understanding"
                 (New American Standard Bible, 2020, Daniel 2:21).
                 """;
         String daniel222 = """
-                “It is He who reveals the profound and hidden things;
+                "It is He who reveals the profound and hidden things;
                 He knows what is in the darkness,
                 and the light dwells with Him"
                 (New American Standard Bible, 2020, Daniel 2:22).

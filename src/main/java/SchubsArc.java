@@ -30,7 +30,7 @@ public class SchubsArc {
      * Separator character
      */
     @Getter
-    private static final char sep = (char) 127;
+    private static final char sep = (char) 255;
 
     /**
      * Compress a set of input files into an LZW table archive
@@ -62,7 +62,7 @@ public class SchubsArc {
                     throw new NoSuchFileException(fnm + " does not exist.");
                 }
                 if (!Files.isRegularFile(filePath)) {
-                    if (Files.isDirectory(Path.of(fnm))) {
+                    if (Files.isDirectory(filePath)) {
                         throw new IOException(fnm + " is a directory. Use glob instead: " + fnm +
                                 File.separator + "*<extension>");
                     }
@@ -105,6 +105,10 @@ public class SchubsArc {
     public static void main(String[] args) throws IOException {
         if (args.length < 2) {
             throw new IllegalArgumentException("Usage: java SchubsArc <archive_name>.zl <[file1 file2 ...]>");
+        }
+
+        if (!args[0].endsWith(".zl")) {
+            args[0] += ".zl";
         }
 
         if (Files.exists(Path.of(args[0]))) {

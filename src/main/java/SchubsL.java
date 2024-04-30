@@ -63,10 +63,6 @@ public class SchubsL {
      * @throws IOException if an I/O error occurs
      */
     public void compress(String fnm, InputStream is) throws IOException {
-        if (!fnm.endsWith(".zl")) {
-            fnm += ".zl";
-        }
-
         try (Bin bin = new Bin(is);
              Bout bout = new Bout(fnm)) {
             LZWAlgorithm(bin, bout);
@@ -91,7 +87,7 @@ public class SchubsL {
 
         while (!input.isEmpty()) {
             String s = st.longestPrefix(input);
-            if (s.isEmpty()) s = Character.toString('\0');
+//            if (s.isEmpty()) s = Character.toString((char) 0);
             bout.write(st.get(s), W);
             int t = s.length();
             if (t < input.length() && code < L) {
