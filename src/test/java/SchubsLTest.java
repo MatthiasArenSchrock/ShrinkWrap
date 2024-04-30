@@ -129,8 +129,7 @@ public class SchubsLTest {
         Files.write(Path.of(blank + ".ll"), new byte[0], StandardOpenOption.CREATE);
         SchubsL.main(new String[] { blank.toString() });
     }
-
-    // TODO
+    
     @Test(expected = IllegalArgumentException.class)
     public void testLZWInputFileIsDirectory() throws IOException {
         SchubsL.main(new String[] { dir.toString() });
