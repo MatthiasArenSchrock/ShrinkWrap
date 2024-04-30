@@ -12,9 +12,23 @@ package DataStructures;
 
 import lombok.Data;
 
+/**
+ * Ternary Search Trie Node for TST implementation
+ *
+ * @param <T> type of value stored in the node
+ * @author Matthias Schrock
+ * @see DataStructures.TST
+ */
 @Data
 public class TSTNode<T> {
+    /**
+     * character stored in the node
+     */
     private char c;
     private TSTNode<T> left, mid, right;
+
+    /**
+     * value stored in the node
+     */
     private T val;
 }

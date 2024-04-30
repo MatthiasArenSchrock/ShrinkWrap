@@ -32,17 +32,17 @@ public class SchubsL {
      * Number of input chars
      */
     @Getter
-    private static final int R = 128;
+    private static final int R = 256;
     /**
      * Number of codewords = 2^W
      */
     @Getter
-    private static final int L = 256;
+    private static final int L = 4096;
     /**
      * Codeword width
      */
     @Getter
-    private static final int W = 8;
+    private static final int W = 12;
 
     /**
      * Compress a file using LZW
@@ -99,7 +99,6 @@ public class SchubsL {
     }
 
     public static void main(String[] args) throws IOException {
-//        args = new String[] { "test1.txt", "test2.txt" };
         if (args.length == 0) {
             throw new IllegalArgumentException("Usage: java SchubsL <filename> | <GLOB>");
         }

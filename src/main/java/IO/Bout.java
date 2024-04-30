@@ -19,14 +19,15 @@ import java.nio.file.Paths;
 
 /**
  * Read binary data from input stream
+ *
  * <br><br>
  * "The tongue of the wise makes knowledge pleasant,
  * but the mouth of fools spouts foolishness"
  * (New American Standard Bible, 2020, Proverbs 15:2).
  * @see AutoCloseable
+ * @author Matthias Schrock
  */
 public class Bout implements AutoCloseable {
-    private static final int BYTE_SIZE = 8;
     private final OutputStream bos;
     private int buf;
     private int n;
@@ -65,7 +66,7 @@ public class Bout implements AutoCloseable {
         }
 
         n++;
-        if (n == 8) {
+        if (n == Byte.SIZE) {
             clearBuf();
         }
     }
@@ -85,9 +86,8 @@ public class Bout implements AutoCloseable {
             return;
         }
 
-        for (int i = 0; i < BYTE_SIZE; i++) {
-            boolean bit = ((x >>> (BYTE_SIZE - i - 1)) & 1) == 1;
-            writeBit(bit);
+        for (int i = 0; i < Byte.SIZE; i++) {
+            writeBit(((x >>> (Byte.SIZE - i - 1)) & 1) == 1);
         }
     }
 
@@ -146,8 +146,7 @@ public class Bout implements AutoCloseable {
         }
 
         for (int i = 0; i < r; i++) {
-            boolean bit = ((x >>> (r - i - 1)) & 1) == 1;
-            writeBit(bit);
+            writeBit(((x >>> (r - i - 1)) & 1) == 1);
         }
     }
 
@@ -189,7 +188,7 @@ public class Bout implements AutoCloseable {
             return;
         }
         if (n > 0) {
-            buf <<= (8 - n);
+            buf <<= (Byte.SIZE - n);
         }
 
         bos.write(buf);

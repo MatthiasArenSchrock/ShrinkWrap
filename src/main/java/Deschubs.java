@@ -14,10 +14,16 @@ import IO.Bin;
 import IO.Bout;
 import lombok.NoArgsConstructor;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 /**
  * Decompression class for LZW and Huffman encoded files as well as LZW compressed archives
+ *
  * @author Matthias Schrock
  */
 @NoArgsConstructor
@@ -70,6 +76,32 @@ public class Deschubs {
      * @throws IOException if an I/O error occurs
      */
     public void deLZW(String fnm) throws IOException {
+        try (Bin bin = new Bin(fnm);
+            Bout bout = new Bout(fnm.substring(0, fnm.lastIndexOf('.')))) {
+            decompressLZW(bin, bout);
+        }
+    }
+
+    /**
+     * Decompress an LZW encoded stream
+     * @param fnm file name
+     * @param tar output stream
+     * @throws IOException if an I/O error occurs
+     */
+    public void deLZW(String fnm, ByteArrayOutputStream tar) throws IOException {
+        try (Bin bin = new Bin(fnm);
+            Bout bout = new Bout(tar)) {
+            decompressLZW(bin, bout);
+        }
+    }
+
+    /**
+     * LZW decompression algorithm
+     * @param bin input stream
+     * @param bout output stream
+     * @throws IOException if an I/O error occurs
+     */
+    private void decompressLZW(Bin bin, Bout bout) throws IOException {
         String[] st = new String[SchubsL.getL()];
         int i;
 
@@ -78,37 +110,101 @@ public class Deschubs {
         }
         st[i++] = "";
 
-        try (Bin bin = new Bin(fnm);
-            Bout bout = new Bout(fnm.substring(0, fnm.lastIndexOf('.')))) {
-            if (bin.isEmpty()) {
-                return;
+        int codeword = bin.readInt(SchubsL.getW());
+        String val = st[codeword];
+
+        while (!bin.isEmpty() && codeword != SchubsL.getR()) {
+            validate(val);
+            bout.write(val);
+
+            codeword = bin.readInt(SchubsL.getW());
+            if (codeword == SchubsL.getR()) {
+                break;
             }
 
-            int codeword = bin.readInt(SchubsL.getW());
-            String val = st[codeword];
+            String s = st[codeword];
+            if (i == codeword) {
+                s = val + val.charAt(0);
+            }
+            if (i < SchubsL.getL()) {
+                st[i++] = val + s.charAt(0);
+            }
 
-            while (!bin.isEmpty()) {
-                bout.write(val);
+            val = s;
+        }
+    }
 
-                codeword = bin.readInt(SchubsL.getW());
-                if (codeword == SchubsL.getR()) {
-                    break;
+    private void validate(String val) {
+        if (val == null) {
+            throw new RuntimeException("Invalid LZW compressed file");
+        }
+    }
+
+    /**
+     * Unarchive an LZW compressed archive
+     * @param fnm file name
+     * @throws IOException if an I/O error occurs
+     */
+    public void unarchive(String fnm) throws IOException {
+        ByteArrayOutputStream tar = new ByteArrayOutputStream();
+        deLZW(fnm, tar);
+
+        try (Bin bin = new Bin(new ByteArrayInputStream(tar.toByteArray()))) {
+            extract(bin);
+        }
+    }
+
+    /**
+     * Extract files from an un-/de-compressed archive
+     * @param bin input stream
+     * @throws IOException if an I/O error occurs
+     */
+    private void extract(Bin bin) throws IOException {
+        while (!bin.isEmpty()) {
+            int fnmsz = bin.readInt();
+            bin.readChar();
+
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < fnmsz; i++) {
+                sb.append(bin.readChar());
+            }
+            String filename = sb.toString();
+            check(filename);
+            bin.readChar();
+
+            long filesize = bin.readLong();
+            bin.readChar();
+
+            try (Bout out = new Bout(filename)) {
+                for (int i = 0; i < filesize; i++) {
+                    out.write(bin.readChar());
                 }
+            }
 
-                String s = st[codeword];
-                if (i == codeword) {
-                    s = val + val.charAt(0);
-                }
-                if (i < SchubsL.getL()) {
-                    st[i++] = val + s.charAt(0);
-                }
-
-                val = s;
+            // Ignore EOF
+            if (!bin.isEmpty()) {
+                if (bin.readChar() != SchubsArc.getSep()) break;
             }
         }
     }
 
-    public void untar(String fnm) {}
+    /**
+     * Check if a file exists or is a directory and create parent directories if necessary
+     * @param fnm file name
+     * @throws IOException if an I/O error occurs
+     */
+    private void check(String fnm) throws IOException {
+        Path p = Path.of(fnm);
+
+        if (Files.exists(p)) {
+            throw new FileAlreadyExistsException("Error unarchiving: " + p +
+                    " already exists. Please move or rename it and try again");
+        }
+
+        if (p.getParent() != null) {
+            Files.createDirectories(p.getParent());
+        }
+    }
 
     /**
      * Decompress a file using extension as clue for decompressor
@@ -121,15 +217,13 @@ public class Deschubs {
         } else if (fnm.endsWith(".ll")) {
             deLZW(fnm);
         } else if (fnm.endsWith(".zl")) {
-            untar(fnm);
+            unarchive(fnm);
         } else {
-            throw new RuntimeException("Invalid file extension");
+            throw new IllegalArgumentException("Invalid file extension");
         }
     }
 
     public static void main(String[] args) throws IOException {
-//        args = new String[] { "test1.txt.ll", "test2.txt.ll" }; // for testing
-//        args = new String[] { "test1.txt.hh", "test2.txt.hh" }; // for testing
         if (args.length < 1) {
             throw new IllegalArgumentException("Usage: java Deschubs <filename>.hh|ll|zl | <GLOB>");
         }
