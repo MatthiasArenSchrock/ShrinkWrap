@@ -45,7 +45,7 @@ public class SchubsArcTest {
         checkFileContents(blankText, new byte[0]);
     }
 
-    @Test(expected = NoSuchFileException.class)
+    @Test(expected = IOException.class)
     public void testArcMissingFile() throws IOException {
         new SchubsArc().compress(dir.resolve("Missing.zl").toString(), "Missing.txt");
     }
@@ -141,6 +141,8 @@ public class SchubsArcTest {
         Files.write(longWordPath, longWord.getBytes());
 
         new SchubsArc().compress(dir.resolve("LongWord.zl").toString(), longWordPath.toString());
+
+        Files.deleteIfExists(longWordPath);
         new Deschubs().unarchive(dir.resolve("LongWord.zl").toString());
 
         checkFileContents(longWordPath, longWord.getBytes());
@@ -153,6 +155,8 @@ public class SchubsArcTest {
         Files.write(lowercasePath, lowercase.getBytes());
 
         new SchubsArc().compress(dir.resolve("Lowercase.zl").toString(), lowercasePath.toString());
+
+        Files.deleteIfExists(lowercasePath);
         new Deschubs().unarchive(dir.resolve("Lowercase.zl").toString());
 
         checkFileContents(lowercasePath, lowercase.getBytes());
@@ -165,30 +169,12 @@ public class SchubsArcTest {
         Files.write(uppercasePath, uppercase.getBytes());
 
         new SchubsArc().compress(dir.resolve("Uppercase.zl").toString(), uppercasePath.toString());
+
+        Files.deleteIfExists(uppercasePath);
         new Deschubs().unarchive(dir.resolve("Uppercase.zl").toString());
 
         checkFileContents(uppercasePath, uppercase.getBytes());
     }
-
-//    private void checkFileContents(Path file, Path... inputs) throws IOException {
-//        StringBuilder expected = new StringBuilder();
-//        for (Path p : inputs) {
-//            String contents = Files.readString(p);
-//            expected.append(p.toString().length());
-//            expected.append(SchubsArc.getSep());
-//            expected.append(p);
-//            expected.append(SchubsArc.getSep());
-//            expected.append((long) contents.length());
-//            expected.append(SchubsArc.getSep());
-//            expected.append(contents);
-//
-//            if (p != inputs[inputs.length - 1]) {
-//                expected.append(SchubsArc.getSep());
-//            }
-//        }
-//
-//        checkFileContents(file, expected.toString().getBytes());
-//    }
 
     private void checkFileContents(Path file, byte[] expected) throws IOException {
         byte[] actual = Files.readAllBytes(file);

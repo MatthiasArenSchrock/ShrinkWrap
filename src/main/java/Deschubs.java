@@ -14,13 +14,16 @@ import IO.Bin;
 import IO.Bout;
 import lombok.NoArgsConstructor;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
 
 /**
  * Decompression class for LZW and Huffman encoded files as well as LZW compressed archives
+ *
  * @author Matthias Schrock
  */
 @NoArgsConstructor
@@ -107,14 +110,11 @@ public class Deschubs {
         }
         st[i++] = "";
 
-        if (bin.isEmpty()) {
-            return;
-        }
-
         int codeword = bin.readInt(SchubsL.getW());
         String val = st[codeword];
 
-        while (!bin.isEmpty()) {
+        while (!bin.isEmpty() && codeword != SchubsL.getR()) {
+            validate(val);
             bout.write(val);
 
             codeword = bin.readInt(SchubsL.getW());
@@ -134,6 +134,12 @@ public class Deschubs {
         }
     }
 
+    private void validate(String val) {
+        if (val == null) {
+            throw new RuntimeException("Invalid LZW compressed file");
+        }
+    }
+
     /**
      * Unarchive an LZW compressed archive
      * @param fnm file name
@@ -143,8 +149,7 @@ public class Deschubs {
         ByteArrayOutputStream tar = new ByteArrayOutputStream();
         deLZW(fnm, tar);
 
-        try (Bin bin = new Bin(new ByteArrayInputStream(
-                Arrays.copyOfRange(tar.toByteArray(), 0, tar.size() - 1)))) {
+        try (Bin bin = new Bin(new ByteArrayInputStream(tar.toByteArray()))) {
             extract(bin);
         }
     }
@@ -157,7 +162,7 @@ public class Deschubs {
     private void extract(Bin bin) throws IOException {
         while (!bin.isEmpty()) {
             int fnmsz = bin.readInt();
-            sep(bin);
+            bin.readChar();
 
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < fnmsz; i++) {
@@ -165,10 +170,10 @@ public class Deschubs {
             }
             String filename = sb.toString();
             check(filename);
-            sep(bin);
+            bin.readChar();
 
             long filesize = bin.readLong();
-            sep(bin);
+            bin.readChar();
 
             try (Bout out = new Bout(filename)) {
                 for (int i = 0; i < filesize; i++) {
@@ -176,14 +181,11 @@ public class Deschubs {
                 }
             }
 
+            // Ignore EOF
             if (!bin.isEmpty()) {
-                if (!sep(bin)) break;
+                if (bin.readChar() != SchubsArc.getSep()) break;
             }
         }
-    }
-
-    private boolean sep(Bin bin) throws IOException {
-        return bin.readChar() == SchubsArc.getSep();
     }
 
     /**
@@ -194,9 +196,9 @@ public class Deschubs {
     private void check(String fnm) throws IOException {
         Path p = Path.of(fnm);
 
-        if (Files.exists(p) || Files.isDirectory(p)) {
-            throw new RuntimeException("Error unarchiving: " + p +
-                    " already exists or is a directory. Please move or rename it and try again");
+        if (Files.exists(p)) {
+            throw new FileAlreadyExistsException("Error unarchiving: " + p +
+                    " already exists. Please move or rename it and try again");
         }
 
         if (p.getParent() != null) {

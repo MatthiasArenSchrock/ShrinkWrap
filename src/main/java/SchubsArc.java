@@ -13,24 +13,28 @@ import IO.Bout;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.Arrays;
 
 /**
  * Create compressed and uncompressed tape archives
+ *
  * @author Matthias Schrock
  */
 @NoArgsConstructor
 public class SchubsArc {
     /**
      * Separator character
+     * @see SchubsL
      */
     @Getter
-    private static final char sep = (char) 255;
+    private static final char sep = (char) (SchubsL.getR() - 1);
 
     /**
      * Compress a set of input files into an LZW table archive
@@ -41,8 +45,10 @@ public class SchubsArc {
      */
     public void compress(String achv, String... fnms) throws IOException {
         SchubsL schubsL = new SchubsL();
-        try (ByteArrayOutputStream tarCont = tar(fnms)) {
-            schubsL.compress(achv, new ByteArrayInputStream(tarCont.toByteArray()));
+
+        try (ByteArrayOutputStream tar = new ByteArrayOutputStream()) {
+            tar(fnms).writeTo(tar);
+            schubsL.compress(achv, new ByteArrayInputStream(tar.toByteArray()));
         }
     }
 
@@ -58,16 +64,7 @@ public class SchubsArc {
         try (Bout bout = new Bout(tarCont)) {
             for (String fnm : fnms) {
                 Path filePath = Path.of(fnm);
-                if (!Files.exists(filePath)) {
-                    throw new NoSuchFileException(fnm + " does not exist.");
-                }
-                if (!Files.isRegularFile(filePath)) {
-                    if (Files.isDirectory(filePath)) {
-                        throw new IOException(fnm + " is a directory. Use glob instead: " + fnm +
-                                File.separator + "*<extension>");
-                    }
-                    throw new IOException("Invalid file " + fnm);
-                }
+                check(filePath);
 
                 bout.write(fnm.length());
                 bout.write(sep);
@@ -85,6 +82,16 @@ public class SchubsArc {
         }
 
         return tarCont;
+    }
+
+    private void check(Path filePath) throws IOException {
+        if (!Files.isRegularFile(filePath)) {
+            if (Files.isDirectory(filePath)) {
+                throw new IOException(filePath + " is a directory. Use glob instead: " + filePath +
+                        File.separator + "*<extension>");
+            }
+            throw new IOException(filePath + " does not exist or cannot be accessed");
+        }
     }
 
     /**

@@ -19,14 +19,16 @@ import java.nio.file.Paths;
 
 /**
  * Read binary data from input stream
+ *
  * <br><br>
  * "A wise person will hear and increase in learning,
  * And a person of understanding will acquire wise counsel"
  * (New American Standard Bible, 2020, Proverbs 1:5).
  * @see AutoCloseable
+ * @author Matthias Schrock
  */
 public class Bin implements AutoCloseable {
-    private InputStream bis;
+    private final InputStream bis;
     private int buf;
     private int n;
 

@@ -32,17 +32,17 @@ public class SchubsL {
      * Number of input chars
      */
     @Getter
-    private static final int R = 128;
+    private static final int R = 256;
     /**
      * Number of codewords = 2^W
      */
     @Getter
-    private static final int L = 256;
+    private static final int L = 4096;
     /**
      * Codeword width
      */
     @Getter
-    private static final int W = 8;
+    private static final int W = 12;
 
     /**
      * Compress a file using LZW
@@ -87,7 +87,6 @@ public class SchubsL {
 
         while (!input.isEmpty()) {
             String s = st.longestPrefix(input);
-//            if (s.isEmpty()) s = Character.toString((char) 0);
             bout.write(st.get(s), W);
             int t = s.length();
             if (t < input.length() && code < L) {

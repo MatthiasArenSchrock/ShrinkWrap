@@ -10,14 +10,28 @@ package DataStructures;
  * Execute     : N/A
  */
 
+/**
+ * Ternary Search Trie implementation
+ *
+ * @param <T> the type of the value to store
+ * @author Matthias Schrock
+ */
 public class TST<T> {
     private int n;
     private TSTNode<T> root;
 
+    /**
+     * @return the number of key/value pairs in the trie
+     */
     public int size() {
         return n;
     }
 
+    /**
+     * Check if the trie contains a key
+     * @param key the key to search for
+     * @return true if the key is in the trie, false otherwise
+     */
     public boolean contains(String key) {
         return get(key) != null;
     }

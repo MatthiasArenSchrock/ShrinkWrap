@@ -13,9 +13,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
+import java.util.Arrays;
+
+import static org.junit.Assert.assertEquals;
 
 public class DeschubsTest {
     private Path dir;
@@ -34,5 +35,25 @@ public class DeschubsTest {
     @Test(expected = RuntimeException.class)
     public void testDeschubsUnsupportedCompress() throws IOException {
         Deschubs.main(new String[] { dir.resolve("test.inval").toString() });
+    }
+
+    @Test(expected = FileAlreadyExistsException.class)
+    public void testExtractingExistingFiles() throws IOException {
+        Path archive = dir.resolve("BleeBlahBlue.zl");
+        Path blee = dir.resolve("Blee.txt");
+        Path blah = dir.resolve("Blah.txt");
+        Files.write(blee, "Blee".getBytes());
+        Files.write(blah, "Blah".getBytes());
+
+        new SchubsArc().compress(archive.toString(), blee.toString(), blah.toString());
+        new Deschubs().unarchive(archive.toString());
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testImproperCompression() throws IOException {
+        Path archive = dir.resolve("BleeBlahBlue.zl");
+        Files.write(archive, "Not proper archive format".getBytes());
+
+        new Deschubs().unarchive(archive.toString());
     }
 }
