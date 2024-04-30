@@ -26,7 +26,6 @@ import java.nio.file.Paths;
  * @see AutoCloseable
  */
 public class Bin implements AutoCloseable {
-    private static final int BYTE_SIZE = 8;
     private InputStream bis;
     private int buf;
     private int n;
@@ -58,7 +57,7 @@ public class Bin implements AutoCloseable {
      */
     private void fill() throws IOException {
         buf = bis.read();
-        n = BYTE_SIZE;
+        n = Byte.SIZE;
     }
 
     /**
@@ -111,12 +110,12 @@ public class Bin implements AutoCloseable {
         checkEmpty();
 
         int x = buf;
-        if (n == 8) {
+        if (n == Byte.SIZE) {
             fill();
             return (char) (x & 0xff);
         }
 
-        x <<= (BYTE_SIZE - n);
+        x <<= (Byte.SIZE - n);
         int oldN = n;
         fill();
 
@@ -135,7 +134,7 @@ public class Bin implements AutoCloseable {
     public int readInt() throws IOException {
         int x = 0;
         for (int i = 0; i < 4; i++) {
-            x <<= BYTE_SIZE;
+            x <<= Byte.SIZE;
             x |= readChar();
         }
 
@@ -177,7 +176,7 @@ public class Bin implements AutoCloseable {
     public long readLong() throws IOException {
         long x = 0;
         for (int i = 0; i < 8; i++) {
-            x <<= BYTE_SIZE;
+            x <<= Byte.SIZE;
             x |= readChar();
         }
 
