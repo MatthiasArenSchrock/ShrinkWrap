@@ -44,5 +44,5 @@ To uncompress: `java Deschubs <filename>.hh|ll | <glob pattern>.hh|.ll`
 Tar CLI: `java SchubsArc <archive-name>[.zl] <filename> [<filename2>]... | <glob pattern>`
 <br>This will compress the files specified by name or globbed as an LZW compressed tar
 
-Untar CLI: `java Deschubs <archive-name>.zl [<archive2-name>.zl]... | <glob pattern>.zl`
+Untar CLI: `java Deschubs <archive-name>.zl`
 <br>This will decompress the LZW compressed tar into the original files, placing them in their respective, original directories (sub/nested directories will be created if they have been deleted between archiving and dearchiving)
