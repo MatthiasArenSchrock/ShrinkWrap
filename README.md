@@ -12,9 +12,8 @@ Tests comprehensively cover data compression algorithm implementations and their
 [CLI instructions for installation]
 
 ## Test Instructions
-[instructions on how to run the tests]
-maven command: mvn test
-Jacoco test coverage report: mvn test jacoco:report
+maven command: `mvn test`
+Jacoco test coverage report: `mvn test jacoco:report`
 The Jacoco plugin generates a test coverage report located: src/target/site/jacoco/index.html
 
 ## Run Examples
@@ -33,14 +32,14 @@ Here are some examples of glob patterns and their meanings:
 | `[abc]*.txt` | Matches any `.txt` file starting with `a`, `b`, or `c` |
 
 ### File Compression CLI
-java SchubsH <filename> [<filename2>]... | <glob pattern>
+`java SchubsH <filename> [<filename2>]... | <glob pattern>`
 this will compress the given file <filename> or globbed files, producing Huffman-encoded <filename>.hh for each file in the original file(s)' directory
 
-java SchubsL <filename> [<filename2>]... | <glob pattern>
+`java SchubsL <filename> [<filename2>]... | <glob pattern>`
 this will compress the given file <filename> or globbed files, producing LZW-encoded <filename>.ll for each file in the original file(s)' directory
 
-To uncompress: java Deschubs <filename>.hh|ll | <glob pattern>*.hh|*.ll
+To uncompress: `java Deschubs <filename>.hh|ll | <glob pattern>*.hh|*.ll`
 
 ### Archive CLI
-Tar CLI: java SchubsArc <archive-name> [<archive2-name>]... | <glob pattern>
-Untar CLI. java Deschubs <archive>.zl|.zh | <glob pattern>*.zl|*.zh
+Tar CLI: `java SchubsArc <archive-name> [<archive2-name>]... | <glob pattern>`
+Untar CLI. `java Deschubs <archive>.zl|.zh | <glob pattern>*.zl|*.zh`
