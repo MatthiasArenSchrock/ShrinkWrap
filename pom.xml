@@ -6,7 +6,7 @@
 
   <groupId>com.mxs</groupId>
   <artifactId>ShrinkWrap</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.0</version>
 
   <name>ShrinkWrap</name>
   <description>SE 2 Final Project - Data Compression</description>
