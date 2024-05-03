@@ -9,14 +9,14 @@
  * Execute     : mvn test
  */
 
+import java.io.IOException;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import org.junit.Before;
 import org.junit.Test;
-
-import java.io.IOException;
-import java.nio.file.*;
-import java.util.Arrays;
-
-import static org.junit.Assert.assertEquals;
 
 public class DeschubsTest {
     private Path dir;

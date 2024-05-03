@@ -44,7 +44,31 @@ Tests comprehensively cover data compression algorithm implementations and the I
 See [Test Instructions](#test-instructions) for details on running tests and generating coverage reports.
 
 ## Installation
-[CLI instructions for installation]
+### Prerequisites
+<pre style="font-size: x-small">
+.
+├── pom.xml
+├── src
+│   ├── main...
+    └── test...
+└── target
+    ├── classes
+    │    ├── DataStructures
+    │    │   ├── TST.class
+    │    │   ├── TSTNode.class
+    │    │   └── TrieNode.class
+    │    ├── Deschubs.class
+    │    ├── IO
+    │    │   ├── Bin.class
+    │    │   └── Bout.class
+    │    ├── SchubsArc.class
+    │    ├── SchubsH.class
+    │    └── SchubsL.class
+    ...
+</pre>
+### Run
+Assuming Java JDK 20+ is installed and the project has been built using `mvn compile` or all individual class files have been compiled using `javac` and are structured properly:
+<br>`java -cp [<relative path to project directory>/]target/classes SchubsH | SchubsL | SchubsArc | Deschubs <args>`
 
 ## Test Instructions
 maven command: `mvn test`
