@@ -45,7 +45,7 @@ See [Test Instructions](#test-instructions) for details on running tests and gen
 
 ## Installation
 ### Prerequisites
-<pre style="font-size: x-small">
+<pre>
 .
 ├── pom.xml
 ├── src
