@@ -180,7 +180,7 @@ public class Deschubs {
                 sb.append(bin.readChar());
             }
             String filename = sb.toString();
-            check(filename);
+            nest(filename);
             bin.readChar();
 
             long filesize = bin.readLong();
@@ -201,13 +201,12 @@ public class Deschubs {
     }
 
     /**
-     * Check if a file exists or is a directory and create parent directories if
-     * necessary
+     * create parent directories if necessary
      * 
      * @param fnm file name
      * @throws IOException if an I/O error occurs
      */
-    private void check(String fnm) throws IOException {
+    private void nest(String fnm) throws IOException {
         Path par = Path.of(fnm).getParent();
         if (par != null) {
             Files.createDirectories(par);
