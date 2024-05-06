@@ -15,16 +15,17 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
 
 /**
  * Read binary data from input stream
  *
- * <br><br>
+ * <br>
+ * <br>
  * "The tongue of the wise makes knowledge pleasant,
  * but the mouth of fools spouts foolishness"
  * (New American Standard Bible, 2020, Proverbs 15:2).
+ * 
  * @see AutoCloseable
  * @author Matthias Schrock
  */
@@ -35,14 +36,13 @@ public class Bout implements AutoCloseable {
 
     /**
      * Create a binary writer from a file
+     * 
      * @param s file name
      * @throws IOException if an I/O error occurs
      */
     public Bout(String s) throws IOException {
         try {
             bos = new BufferedOutputStream(Files.newOutputStream(Paths.get(s)));
-        } catch (NoSuchFileException e) {
-            throw new NoSuchFileException(s + " does not exist");
         } catch (IOException e) {
             throw new IOException("Error opening file " + s);
         }
@@ -53,6 +53,7 @@ public class Bout implements AutoCloseable {
 
     /**
      * Create a binary writer from a buffered output stream
+     * 
      * @param baos the buffered output stream
      */
     public Bout(ByteArrayOutputStream baos) {
@@ -63,6 +64,7 @@ public class Bout implements AutoCloseable {
 
     /**
      * Write a bit/boolean to the output stream
+     * 
      * @param bit the bit/boolean to write
      * @throws IOException if an I/O error occurs
      */
@@ -81,6 +83,7 @@ public class Bout implements AutoCloseable {
 
     /**
      * Write 8-bit byte to the output stream
+     * 
      * @param x the byte to write
      * @throws IOException if an I/O error occurs
      */
@@ -101,6 +104,7 @@ public class Bout implements AutoCloseable {
 
     /**
      * Write 8-bit char to the output stream
+     * 
      * @param c the character to write
      * @throws IOException if an I/O error occurs
      */
@@ -114,6 +118,7 @@ public class Bout implements AutoCloseable {
 
     /**
      * Write a string to the output stream
+     * 
      * @param s the string to write
      * @throws IOException if an I/O error occurs
      */
@@ -125,6 +130,7 @@ public class Bout implements AutoCloseable {
 
     /**
      * Write 32-bit int to the output stream
+     * 
      * @param x the integer to write
      * @throws IOException if an I/O error occurs
      */
@@ -137,6 +143,7 @@ public class Bout implements AutoCloseable {
 
     /**
      * Write r-bit int to the output stream
+     * 
      * @param x the integer to write
      * @param r the number of relevant bits in the integer
      * @throws IOException if an I/O error occurs
@@ -160,6 +167,7 @@ public class Bout implements AutoCloseable {
 
     /**
      * Write 64-bit long to output stream
+     * 
      * @param l the long to write
      * @throws IOException if an I/O error occurs
      */
@@ -170,6 +178,7 @@ public class Bout implements AutoCloseable {
 
     /**
      * Close the output stream
+     * 
      * @throws IOException if an I/O error occurs
      */
     @Override
@@ -180,6 +189,7 @@ public class Bout implements AutoCloseable {
 
     /**
      * flush the buffer
+     * 
      * @throws IOException if an I/O error occurs
      */
     public void flush() throws IOException {
@@ -189,6 +199,7 @@ public class Bout implements AutoCloseable {
 
     /**
      * Clear the buffer
+     * 
      * @throws IOException if an I/O error occurs
      */
     private void clearBuf() throws IOException {

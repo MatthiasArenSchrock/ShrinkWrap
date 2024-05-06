@@ -22,7 +22,8 @@ import IO.Bout;
 import lombok.NoArgsConstructor;
 
 /**
- * Decompression class for LZW and Huffman encoded files as well as LZW compressed archives
+ * Decompression class for LZW and Huffman encoded files as well as LZW
+ * compressed archives
  *
  * @author Matthias Schrock
  */
@@ -30,12 +31,13 @@ import lombok.NoArgsConstructor;
 public class Deschubs {
     /**
      * Decompress a Huffman encoded file
+     * 
      * @param fnm file name
      * @throws IOException if an I/O error occurs
      */
     public void deHuffman(String fnm) throws IOException {
         try (Bin bin = new Bin(fnm);
-            Bout bout = new Bout(fnm.substring(0, fnm.lastIndexOf('.')))) {
+                Bout bout = new Bout(fnm.substring(0, fnm.lastIndexOf('.')))) {
             TrieNode root = readTrie(bin);
 
             int length = bin.readInt();
@@ -56,6 +58,7 @@ public class Deschubs {
 
     /**
      * Read a trie from the input stream
+     * 
      * @param bin input stream
      * @return root of the trie
      * @throws IOException if an I/O error occurs
@@ -64,40 +67,42 @@ public class Deschubs {
         boolean isLeaf = bin.readBit();
         if (isLeaf) {
             return new TrieNode(bin.readChar(), -1, null, null);
-        }
-        else {
+        } else {
             return new TrieNode('\0', -1, readTrie(bin), readTrie(bin));
         }
     }
 
     /**
      * Decompress an LZW encoded file
+     * 
      * @param fnm file name
      * @throws IOException if an I/O error occurs
      */
     public void deLZW(String fnm) throws IOException {
         try (Bin bin = new Bin(fnm);
-            Bout bout = new Bout(fnm.substring(0, fnm.lastIndexOf('.')))) {
+                Bout bout = new Bout(fnm.substring(0, fnm.lastIndexOf('.')))) {
             decompressLZW(bin, bout);
         }
     }
 
     /**
      * Decompress an LZW encoded stream
+     * 
      * @param fnm file name
      * @param tar output stream
      * @throws IOException if an I/O error occurs
      */
     public void deLZW(String fnm, ByteArrayOutputStream tar) throws IOException {
         try (Bin bin = new Bin(fnm);
-            Bout bout = new Bout(tar)) {
+                Bout bout = new Bout(tar)) {
             decompressLZW(bin, bout);
         }
     }
 
     /**
      * LZW decompression algorithm
-     * @param bin input stream
+     * 
+     * @param bin  input stream
      * @param bout output stream
      * @throws IOException if an I/O error occurs
      */
@@ -142,6 +147,7 @@ public class Deschubs {
 
     /**
      * Unarchive an LZW compressed archive
+     * 
      * @param fnm file name
      * @throws IOException if an I/O error occurs
      */
@@ -156,6 +162,7 @@ public class Deschubs {
 
     /**
      * Extract files from an un-/de-compressed archive
+     * 
      * @param bin input stream
      * @throws IOException if an I/O error occurs
      */
@@ -183,13 +190,16 @@ public class Deschubs {
 
             // Ignore EOF
             if (!bin.isEmpty()) {
-                if (bin.readChar() != SchubsArc.getSep()) break;
+                if (bin.readChar() != SchubsArc.getSep())
+                    break;
             }
         }
     }
 
     /**
-     * Check if a file exists or is a directory and create parent directories if necessary
+     * Check if a file exists or is a directory and create parent directories if
+     * necessary
+     * 
      * @param fnm file name
      * @throws IOException if an I/O error occurs
      */
@@ -208,6 +218,7 @@ public class Deschubs {
 
     /**
      * Decompress a file using extension as clue for decompressor
+     * 
      * @param fnm file name
      * @throws IOException if an I/O error occurs
      */
@@ -231,7 +242,7 @@ public class Deschubs {
             for (String fnm : args) {
                 deschubs.decompress(fnm);
             }
-        } catch (IOException e) {
+        } catch (IllegalArgumentException | IOException e) {
             System.err.println(e.getMessage());
         }
     }

@@ -29,6 +29,7 @@ public class TST<T> {
 
     /**
      * Check if the trie contains a key
+     * 
      * @param key the key to search for
      * @return true if the key is in the trie, false otherwise
      */
@@ -38,6 +39,7 @@ public class TST<T> {
 
     /**
      * Get the value associated with a key
+     * 
      * @param key the key to search for
      * @return the value associated with the key
      */
@@ -53,9 +55,10 @@ public class TST<T> {
 
     /**
      * Return sub-trie from a given key
+     * 
      * @param node the node to start from
-     * @param key the key to search for
-     * @param d the depth of the key
+     * @param key  the key to search for
+     * @param d    the depth of the key
      * @return the sub-trie from the given key
      */
     private TSTNode<T> get(TSTNode<T> node, String key, int d) {
@@ -78,6 +81,7 @@ public class TST<T> {
 
     /**
      * Insert string into the symbol table
+     * 
      * @param key the key to insert
      * @param val the value to associate with the key
      */
@@ -90,10 +94,11 @@ public class TST<T> {
 
     /**
      * Insert a key/value pair into the trie
+     * 
      * @param node the node to start from
-     * @param key the key to insert
-     * @param val the value to associate with the key
-     * @param d the depth of the key
+     * @param key  the key to insert
+     * @param val  the value to associate with the key
+     * @param d    the depth of the key
      * @return the node with the key/value pair inserted
      */
     private TSTNode<T> put(TSTNode<T> node, String key, T val, int d) {
@@ -118,6 +123,7 @@ public class TST<T> {
 
     /**
      * Find and return the longest prefix of a string in the trie
+     * 
      * @param s the string to search for
      * @return the longest prefix of the string in the trie
      */

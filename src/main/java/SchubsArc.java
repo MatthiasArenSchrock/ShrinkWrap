@@ -30,6 +30,7 @@ import lombok.NoArgsConstructor;
 public class SchubsArc {
     /**
      * Separator character
+     * 
      * @see SchubsL
      */
     @Getter
@@ -113,7 +114,7 @@ public class SchubsArc {
             validateArgs(args);
 
             new SchubsArc().compress(args[0], Arrays.copyOfRange(args, 1, args.length));
-        } catch(IOException e) {
+        } catch (IllegalArgumentException | IOException e) {
             System.err.println(e.getMessage());
         }
     }
@@ -126,7 +127,7 @@ public class SchubsArc {
             args[0] += ".zl";
         }
         if (Files.exists(Path.of(args[0]))) {
-            throw new IllegalArgumentException("Archive already exists: " + args[0]);
+            throw new IllegalArgumentException(args[0] + " already exists. Use a unique name");
         }
     }
 }

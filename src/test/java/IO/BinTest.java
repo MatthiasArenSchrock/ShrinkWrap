@@ -1,5 +1,17 @@
 package IO;
 
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+
 /*
  * Program     : BinTest
  * Description : Test read binary data from input stream
@@ -13,14 +25,6 @@ package IO;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
-
-import static org.junit.Assert.*;
 
 public class BinTest {
     private Path testFile;
@@ -42,6 +46,11 @@ public class BinTest {
     @After
     public void tearDown() throws IOException {
         bin.close();
+    }
+
+    @Test(expected = IOException.class)
+    public void testBinThrowsExceptionIfFileDoesNotExist() throws IOException {
+        bin = new Bin("doesnotexist.txt");
     }
 
     @Test

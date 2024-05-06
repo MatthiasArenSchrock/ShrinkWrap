@@ -9,32 +9,50 @@
  * Execute     : mvn test
  */
 
+import static org.junit.Assert.assertEquals;
+
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 public class DeschubsTest {
     private Path dir;
+    private final PrintStream originalErr = System.err;
+    private final ByteArrayOutputStream newErr = new ByteArrayOutputStream();
 
     @Before
     public void setUp() throws IOException {
         dir = Paths.get("src", "test", "resource", "Deschubs");
         Files.createDirectories(dir);
+
+        System.setErr(new PrintStream(newErr));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @After
+    public void restoreStreams() {
+        System.setErr(originalErr);
+    }
+
+    @Test
     public void testDeschubsWrongNumArgs() throws IOException {
         Deschubs.main(new String[] {});
-    }
 
-    @Test(expected = RuntimeException.class)
+        assertEquals(newErr.toString(), "Usage: java Deschubs <filename>.hh|ll|zl | <GLOB>" + "\n");
+    }
+    
+    @Test
     public void testDeschubsUnsupportedCompress() throws IOException {
         Deschubs.main(new String[] { dir.resolve("test.inval").toString() });
+
+        assertEquals(newErr.toString(), "Invalid file extension" + "\n");
     }
 
     @Test(expected = FileAlreadyExistsException.class)

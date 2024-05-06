@@ -23,6 +23,7 @@ import lombok.NoArgsConstructor;
 
 /**
  * Compress one to many files using Huffman encoding
+ * 
  * @author Matthias Schrock
  */
 @NoArgsConstructor
@@ -31,12 +32,13 @@ public class SchubsH {
 
     /**
      * Compress a file
+     * 
      * @param fnm file name
      * @throws IOException if an I/O error occurs
      */
     public void compress(String fnm) throws IOException {
         try (Bin bin = new Bin(fnm);
-             Bout bout = new Bout(fnm + ".hh")) {
+                Bout bout = new Bout(fnm + ".hh")) {
             byte[] input = bin.readAllBytes();
 
             int[] freq = new int[R];
@@ -64,6 +66,7 @@ public class SchubsH {
 
     /**
      * Build a trie from the frequency array
+     * 
      * @param freq frequency array
      * @return root of the trie
      */
@@ -87,7 +90,8 @@ public class SchubsH {
 
     /**
      * Write the trie to the output stream
-     * @param n node of the trie
+     * 
+     * @param n    node of the trie
      * @param bout output stream
      * @throws IOException if an I/O error occurs
      */
@@ -105,9 +109,10 @@ public class SchubsH {
 
     /**
      * Build the code table
+     * 
      * @param ct code table
-     * @param n node of the trie
-     * @param s bitstring
+     * @param n  node of the trie
+     * @param s  bitstring
      */
     private void buildCode(String[] ct, TrieNode n, String s) {
         if (!n.isLeaf()) {
@@ -126,17 +131,17 @@ public class SchubsH {
             for (String arg : args) {
                 sh.compress(arg);
             }
-        } catch (IOException e) {
+        } catch (IllegalArgumentException | IOException e) {
             System.err.println(e.getMessage());
         }
     }
 
-    private static void validateArgs(String[] args) {
+    private static void validateArgs(String[] args) throws IllegalArgumentException {
         if (args.length < 1) {
             throw new IllegalArgumentException("Usage: java SchubsH <filename> | <GLOB>");
         }
         if (Files.exists(Path.of(args[0] + ".hh"))) {
-            throw new IllegalArgumentException("File already exists: " + args[0] + ".hh");
+            throw new IllegalArgumentException(args[0] + ".hh already exists");
         }
         if (Files.isDirectory(Path.of(args[0]))) {
             throw new IllegalArgumentException("Input file is a directory. Use Glob instead: " +

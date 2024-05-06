@@ -16,7 +16,7 @@ package DataStructures;
  * @author Matthias Schrock
  */
 public record TrieNode(char ch, int freq, DataStructures.TrieNode left,
-                       DataStructures.TrieNode right) implements Comparable<TrieNode> {
+        DataStructures.TrieNode right) implements Comparable<TrieNode> {
     public boolean isLeaf() {
         return (left == null && right == null);
     }

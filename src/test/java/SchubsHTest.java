@@ -10,7 +10,10 @@
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
@@ -20,16 +23,26 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 public class SchubsHTest {
     private Path dir;
+    private final PrintStream originalErr = System.err;
+    private final ByteArrayOutputStream newErr = new ByteArrayOutputStream();
 
     @Before
     public void setUp() throws IOException {
         dir = Paths.get("src", "test", "resource", "SchubsH");
         Files.createDirectories(dir);
+
+        System.setErr(new PrintStream(newErr));
+    }
+
+    @After
+    public void restoreStreams() {
+        System.setErr(originalErr);
     }
 
     @Test
@@ -41,7 +54,7 @@ public class SchubsHTest {
         new SchubsH().compress(bleeText.toString());
 
         checkFileContents(Paths.get(bleeText + ".hh"),
-                new byte[] {44, -74, -59, 8, -80, -38, 23, 88, 80, 0, 0, 0, 116, -121, -50, 111, -49, 0});
+                new byte[] { 44, -74, -59, 8, -80, -38, 23, 88, 80, 0, 0, 0, 116, -121, -50, 111, -49, 0 });
 
         new Deschubs().deHuffman(bleeText + ".hh");
         checkFileContents(bleeText, blee.getBytes());
@@ -56,7 +69,7 @@ public class SchubsHTest {
 
         // EOF, 0 - root, 0000 - 4-byte int length
         checkFileContents(Paths.get(blankText + ".hh"),
-                new byte[] {-128, 0, 0, 0, 0, 0});
+                new byte[] { -128, 0, 0, 0, 0, 0 });
 
         new Deschubs().deHuffman(blankText + ".hh");
         checkFileContents(blankText, new byte[0]);
@@ -84,9 +97,10 @@ public class SchubsHTest {
         checkFileContents(manyThingsTest, manyThingsText.getBytes());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testHuffmanWrongNumArgs() throws IOException {
         SchubsH.main(new String[] {});
+        assertEquals(newErr.toString(), "Usage: java SchubsH <filename> | <GLOB>" + "\n");
     }
 
     @Test
@@ -120,9 +134,9 @@ public class SchubsHTest {
         new SchubsH().compress(longWordText.toString());
 
         checkFileContents(Paths.get(longWordText + ".hh"),
-                new byte[] {45, 37, -51, 103, -70, 46, -74, 81, 111, -72, 23, -117, 53,
-                        -56, 84, -20, -106, 21, -78,-58, 0, 0, 0, 69, -122, -105, -65, -34,
-                        43, 122, -93, -124, 89, -17, 73, 55, -116, -57, -112, -56});
+                new byte[] { 45, 37, -51, 103, -70, 46, -74, 81, 111, -72, 23, -117, 53,
+                        -56, 84, -20, -106, 21, -78, -58, 0, 0, 0, 69, -122, -105, -65, -34,
+                        43, 122, -93, -124, 89, -17, 73, 55, -116, -57, -112, -56 });
 
         new Deschubs().deHuffman(longWordText + ".hh");
         checkFileContents(longWordText, longWord.getBytes());
@@ -137,9 +151,9 @@ public class SchubsHTest {
         new SchubsH().compress(lowercaseText.toString());
 
         checkFileContents(Paths.get(lowercaseText + ".hh"),
-                new byte[] {11, -83, -59, 114, -71, -106, 107, 97, 111, -74, -83, 118, 48, -80, -34, -106,
+                new byte[] { 11, -83, -59, 114, -71, -106, 107, 97, 111, -74, -83, 118, 48, -80, -34, -106,
                         123, 113, 116, -76, -81, 22, 65, 101, -75, 47, 54, 34, -17, 104, 93, -82, 0, 0, 0,
-                        3, 80, -37, -17, -124, -105, 107, -105, 43, 102, -49, -119, 29, 3, -36, -74, -94});
+                        3, 80, -37, -17, -124, -105, 107, -105, 43, 102, -49, -119, 29, 3, -36, -74, -94 });
 
         new Deschubs().deHuffman(lowercaseText + ".hh");
         checkFileContents(lowercaseText, lowercase.getBytes());
@@ -154,24 +168,29 @@ public class SchubsHTest {
         new SchubsH().compress(uppercaseText.toString());
 
         checkFileContents(Paths.get(uppercaseText + ".hh"),
-                new byte[] {10, -83, 69, 82, -87, -108, 106, 97, 79, -90, -87, 116, 48, -96, -42, -108,122,
+                new byte[] { 10, -83, 69, 82, -87, -108, 106, 97, 79, -90, -87, 116, 48, -96, -42, -108, 122,
                         113, 84, -92, -85, 20, 65, 69, -91, 43, 52, 34, -81, 72, 85, -86, 0, 0, 0, 3, 80,
-                        -37, -17, -124, -105, 107, -105, 43, 102, -49, -119, 29, 3, -36, -74, -94});
+                        -37, -17, -124, -105, 107, -105, 43, 102, -49, -119, 29, 3, -36, -74, -94 });
 
         new Deschubs().deHuffman(uppercaseText + ".hh");
         checkFileContents(uppercaseText, uppercase.getBytes());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testHuffmanFileAlreadyExists() throws IOException {
         Path blank = dir.resolve("Blank.txt");
         Files.write(Path.of(blank + ".hh"), new byte[0], StandardOpenOption.CREATE);
         SchubsH.main(new String[] { blank.toString() });
+
+        assertEquals(newErr.toString(), blank.toString() + ".hh already exists" + "\n");
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testHuffmanInputFileIsDirectory() throws IOException {
         SchubsH.main(new String[] { dir.toString() });
+
+        assertEquals(newErr.toString(), "Input file is a directory. Use Glob instead: " + "java SchubsH "
+                + dir.toString() + File.separator + "<glob>" + "\n");
     }
 
     private void checkFileContents(Path file, byte[] expected) throws IOException {

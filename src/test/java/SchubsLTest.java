@@ -10,7 +10,10 @@
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
@@ -20,16 +23,26 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 public class SchubsLTest {
     private Path dir;
+    private final PrintStream originalErr = System.err;
+    private final ByteArrayOutputStream newErr = new ByteArrayOutputStream();
 
     @Before
     public void setUp() throws IOException {
         dir = Paths.get("src", "test", "resource", "SchubsL");
         Files.createDirectories(dir);
+
+        System.setErr(new PrintStream(newErr));
+    }
+
+    @After
+    public void restoreStreams() {
+        System.setErr(originalErr);
     }
 
     @Test
@@ -40,7 +53,7 @@ public class SchubsLTest {
         new SchubsL().compress(blankText.toString());
 
         // LZW is going to write value of R for empty file
-        checkFileContents(Paths.get(blankText + ".ll"), new byte[] {16, 0});
+        checkFileContents(Paths.get(blankText + ".ll"), new byte[] { 16, 0 });
 
         new Deschubs().deLZW(blankText + ".ll");
         checkFileContents(blankText, new byte[0]);
@@ -122,21 +135,28 @@ public class SchubsLTest {
         checkFileContents(uppercaseText, uppercase.getBytes());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testLZWWrongNumArgs() {
         SchubsL.main(new String[] {});
+
+        assertEquals(newErr.toString(), "Usage: java SchubsL <filename> | <GLOB>" + "\n");
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testLZWFileAlreadyExists() throws IOException {
         Path blank = dir.resolve("Blank.txt");
         Files.write(Path.of(blank + ".ll"), new byte[0], StandardOpenOption.CREATE);
         SchubsL.main(new String[] { blank.toString() });
+
+        assertEquals(newErr.toString(), blank.toString() + ".ll already exists" + "\n");
     }
-    
-    @Test(expected = IllegalArgumentException.class)
+
+    @Test
     public void testLZWInputFileIsDirectory() {
         SchubsL.main(new String[] { dir.toString() });
+
+        assertEquals(newErr.toString(), "Input file is a directory. Use Glob instead: " + "java SchubsL "
+                + dir.toString() + File.separator + "<glob>" + "\n");
     }
 
     private void checkFileContents(Path file, byte[] expected) throws IOException {

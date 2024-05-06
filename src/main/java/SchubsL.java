@@ -23,6 +23,7 @@ import lombok.NoArgsConstructor;
 
 /**
  * Compress one to many files using LZW encoding
+ * 
  * @author Matthias Schrock
  */
 @NoArgsConstructor
@@ -45,32 +46,35 @@ public class SchubsL {
 
     /**
      * Compress a file using LZW
+     * 
      * @param fnm the file to compress
      * @throws IOException if an I/O error occurs
      */
     public void compress(String fnm) throws IOException {
         try (Bin bin = new Bin(fnm);
-            Bout bout = new Bout(fnm + ".ll")) {
+                Bout bout = new Bout(fnm + ".ll")) {
             LZWAlgorithm(bin, bout);
         }
     }
 
     /**
      * Compress an input stream using LZW
+     * 
      * @param fnm the output filename
-     * @param is the input stream
+     * @param is  the input stream
      * @throws IOException if an I/O error occurs
      */
     public void compress(String fnm, InputStream is) throws IOException {
         try (Bin bin = new Bin(is);
-             Bout bout = new Bout(fnm)) {
+                Bout bout = new Bout(fnm)) {
             LZWAlgorithm(bin, bout);
         }
     }
 
     /**
      * LZW compression algorithm
-     * @param bin the input stream
+     * 
+     * @param bin  the input stream
      * @param bout the output stream
      * @throws IOException if an I/O error occurs
      */
@@ -105,7 +109,7 @@ public class SchubsL {
             for (String arg : args) {
                 schubsL.compress(arg);
             }
-        } catch (IOException e) {
+        } catch (IllegalArgumentException | IOException e) {
             System.err.println(e.getMessage());
         }
     }

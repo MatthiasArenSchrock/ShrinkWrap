@@ -11,7 +11,9 @@
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -19,21 +21,33 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 public class SchubsArcTest {
     private Path dir;
+    private final PrintStream originalErr = System.err;
+    private final ByteArrayOutputStream newErr = new ByteArrayOutputStream();
 
     @Before
     public void setUp() throws IOException {
         dir = Paths.get("src", "test", "resource", "SchubsArc");
         Files.createDirectories(dir);
+
+        System.setErr(new PrintStream(newErr));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @After
+    public void restoreStreams() {
+        System.setErr(originalErr);
+    }
+
+    @Test
     public void testArcWrongNumArgs() {
         SchubsArc.main(new String[] {});
+
+        assertEquals(newErr.toString(), "Usage: java SchubsArc <archive_name>.zl <[file1 file2 ...]>" + "\n");
     }
 
     @Test
@@ -63,7 +77,7 @@ public class SchubsArcTest {
         new SchubsArc().compress(dir.resolve("Missing.zl").toString(), "Missing.txt");
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testArcAlreadyExists() throws IOException {
         Path blankText = dir.resolve("Blank.txt");
         Path blankArc = dir.resolve("Blank.zl");
@@ -71,6 +85,8 @@ public class SchubsArcTest {
         Files.write(blankArc, new byte[0]);
 
         SchubsArc.main(new String[] { blankArc.toString(), blankText.toString() });
+
+        assertEquals(newErr.toString(), blankArc.toString() + " already exists. Use a unique name" + "\n");
     }
 
     @Test
