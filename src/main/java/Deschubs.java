@@ -12,9 +12,9 @@
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 
 import DataStructures.TrieNode;
 import IO.Bin;
@@ -33,11 +33,12 @@ public class Deschubs {
      * Decompress a Huffman encoded file
      * 
      * @param fnm file name
+     * @param stdOpen open option. By default, option is set to CREATE
      * @throws IOException if an I/O error occurs
      */
-    public void deHuffman(String fnm) throws IOException {
+    public void deHuffman(String fnm, StandardOpenOption... stdOpen) throws IOException {
         try (Bin bin = new Bin(fnm);
-                Bout bout = new Bout(fnm.substring(0, fnm.lastIndexOf('.')))) {
+                Bout bout = new Bout(fnm.substring(0, fnm.lastIndexOf('.')), stdOpen)) {
             TrieNode root = readTrie(bin);
 
             int length = bin.readInt();
@@ -76,11 +77,12 @@ public class Deschubs {
      * Decompress an LZW encoded file
      * 
      * @param fnm file name
+     * @param stdOpen open option. By default, option is set to CREATE
      * @throws IOException if an I/O error occurs
      */
-    public void deLZW(String fnm) throws IOException {
+    public void deLZW(String fnm, StandardOpenOption... stdOpen) throws IOException {
         try (Bin bin = new Bin(fnm);
-                Bout bout = new Bout(fnm.substring(0, fnm.lastIndexOf('.')))) {
+                Bout bout = new Bout(fnm.substring(0, fnm.lastIndexOf('.')), stdOpen)) {
             decompressLZW(bin, bout);
         }
     }
@@ -89,7 +91,7 @@ public class Deschubs {
      * Decompress an LZW encoded stream
      * 
      * @param fnm file name
-     * @param tar output stream
+     * @param tar output stream. By default, option is set to CREATE
      * @throws IOException if an I/O error occurs
      */
     public void deLZW(String fnm, ByteArrayOutputStream tar) throws IOException {
@@ -149,14 +151,15 @@ public class Deschubs {
      * Unarchive an LZW compressed archive
      * 
      * @param fnm file name
+     * @param stdOpen open option. By default, option is set to CREATE
      * @throws IOException if an I/O error occurs
      */
-    public void unarchive(String fnm) throws IOException {
+    public void unarchive(String fnm, StandardOpenOption... stdOpen) throws IOException {
         ByteArrayOutputStream tar = new ByteArrayOutputStream();
         deLZW(fnm, tar);
 
         try (Bin bin = new Bin(new ByteArrayInputStream(tar.toByteArray()))) {
-            extract(bin);
+            extract(bin, stdOpen);
         }
     }
 
@@ -164,9 +167,10 @@ public class Deschubs {
      * Extract files from an un-/de-compressed archive
      * 
      * @param bin input stream
+     * @param stdOpen open option. By default, option is set to CREATE
      * @throws IOException if an I/O error occurs
      */
-    private void extract(Bin bin) throws IOException {
+    private void extract(Bin bin, StandardOpenOption... stdOpen) throws IOException {
         while (!bin.isEmpty()) {
             int fnmsz = bin.readInt();
             bin.readChar();
@@ -182,7 +186,7 @@ public class Deschubs {
             long filesize = bin.readLong();
             bin.readChar();
 
-            try (Bout out = new Bout(filename)) {
+            try (Bout out = new Bout(filename, stdOpen)) {
                 for (int i = 0; i < filesize; i++) {
                     out.write(bin.readChar());
                 }
@@ -204,15 +208,9 @@ public class Deschubs {
      * @throws IOException if an I/O error occurs
      */
     private void check(String fnm) throws IOException {
-        Path p = Path.of(fnm);
-
-        if (Files.exists(p)) {
-            throw new FileAlreadyExistsException("Error unarchiving: " + p +
-                    " already exists. Please move or rename it and try again");
-        }
-
-        if (p.getParent() != null) {
-            Files.createDirectories(p.getParent());
+        Path par = Path.of(fnm).getParent();
+        if (par != null) {
+            Files.createDirectories(par);
         }
     }
 
@@ -224,11 +222,11 @@ public class Deschubs {
      */
     private void decompress(String fnm) throws IOException {
         if (fnm.endsWith(".hh")) {
-            deHuffman(fnm);
+            deHuffman(fnm, StandardOpenOption.CREATE_NEW);
         } else if (fnm.endsWith(".ll")) {
-            deLZW(fnm);
+            deLZW(fnm, StandardOpenOption.CREATE_NEW);
         } else if (fnm.endsWith(".zl")) {
-            unarchive(fnm);
+            unarchive(fnm, StandardOpenOption.CREATE_NEW);
         } else {
             throw new IllegalArgumentException("Invalid file extension");
         }

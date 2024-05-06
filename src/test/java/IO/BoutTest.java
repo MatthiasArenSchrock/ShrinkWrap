@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -46,6 +47,12 @@ public class BoutTest {
         if (bout != null) {
             bout.close();
         }
+    }
+
+    @Test(expected = FileAlreadyExistsException.class)
+    public void testOpenOption() throws IOException {
+        tearDown();
+        bout = new Bout(testFile.toString(), StandardOpenOption.CREATE_NEW);
     }
 
     @Test

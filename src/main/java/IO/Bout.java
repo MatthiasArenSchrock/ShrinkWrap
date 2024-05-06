@@ -14,8 +14,10 @@ import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 
 /**
  * Read binary data from input stream
@@ -37,12 +39,15 @@ public class Bout implements AutoCloseable {
     /**
      * Create a binary writer from a file
      * 
-     * @param s file name
+     * @param s  file name
+     * @param oo the open option
      * @throws IOException if an I/O error occurs
      */
-    public Bout(String s) throws IOException {
+    public Bout(String s, StandardOpenOption... oo) throws IOException {
         try {
-            bos = new BufferedOutputStream(Files.newOutputStream(Paths.get(s)));
+            bos = new BufferedOutputStream(Files.newOutputStream(Paths.get(s), oo));
+        } catch (FileAlreadyExistsException e) {
+            throw new FileAlreadyExistsException(s + " already exists. Try deleting or renaming it first.");
         } catch (IOException e) {
             throw new IOException("Error opening file " + s);
         }

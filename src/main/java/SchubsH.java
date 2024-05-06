@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.Optional;
 import java.util.PriorityQueue;
 
@@ -31,35 +32,47 @@ public class SchubsH {
     private static final int R = 256;
 
     /**
-     * Compress a file
+     * Compress a file using huffman to filename.hh
      * 
      * @param fnm file name
+     * @param stdOpen open options. By default, option is set to CREATE
      * @throws IOException if an I/O error occurs
      */
-    public void compress(String fnm) throws IOException {
+    public void compress(String fnm, StandardOpenOption... stdOpen) throws IOException {
         try (Bin bin = new Bin(fnm);
-                Bout bout = new Bout(fnm + ".hh")) {
-            byte[] input = bin.readAllBytes();
+                Bout bout = new Bout(fnm + ".hh", stdOpen)) {
+            huffmanAlgorithm(bin, bout);
+        }
+    }
 
-            int[] freq = new int[R];
-            for (byte value : input) {
-                freq[value]++;
-            }
+    /**
+     * Huffman compression algorithm
+     * 
+     * @param bin input stream
+     * @param bout output stream
+     * @throws IOException if an I/O error occurs
+     */
+    private void huffmanAlgorithm(Bin bin, Bout bout) throws IOException {
+        byte[] input = bin.readAllBytes();
 
-            TrieNode root = buildTrie(freq)
-                    .orElse(new TrieNode('\0', 0, null, null));
+        int[] freq = new int[R];
+        for (byte value : input) {
+            freq[value]++;
+        }
 
-            String[] ct = new String[R];
-            buildCode(ct, root, "");
+        TrieNode root = buildTrie(freq)
+                .orElse(new TrieNode('\0', 0, null, null));
 
-            writeTrie(root, bout);
-            bout.write(input.length);
+        String[] ct = new String[R];
+        buildCode(ct, root, "");
 
-            for (byte b : input) {
-                String code = ct[b];
-                for (int j = 0; j < code.length(); j++) {
-                    bout.writeBit(code.charAt(j) == '1');
-                }
+        writeTrie(root, bout);
+        bout.write(input.length);
+
+        for (byte b : input) {
+            String code = ct[b];
+            for (int j = 0; j < code.length(); j++) {
+                bout.writeBit(code.charAt(j) == '1');
             }
         }
     }
@@ -129,7 +142,7 @@ public class SchubsH {
 
             SchubsH sh = new SchubsH();
             for (String arg : args) {
-                sh.compress(arg);
+                sh.compress(arg, StandardOpenOption.CREATE_NEW);
             }
         } catch (IllegalArgumentException | IOException e) {
             System.err.println(e.getMessage());
@@ -139,9 +152,6 @@ public class SchubsH {
     private static void validateArgs(String[] args) throws IllegalArgumentException {
         if (args.length < 1) {
             throw new IllegalArgumentException("Usage: java SchubsH <filename> | <GLOB>");
-        }
-        if (Files.exists(Path.of(args[0] + ".hh"))) {
-            throw new IllegalArgumentException(args[0] + ".hh already exists");
         }
         if (Files.isDirectory(Path.of(args[0]))) {
             throw new IllegalArgumentException("Input file is a directory. Use Glob instead: " +

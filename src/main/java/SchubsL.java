@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 
 import DataStructures.TST;
 import IO.Bin;
@@ -45,14 +46,15 @@ public class SchubsL {
     private static final int W = 12;
 
     /**
-     * Compress a file using LZW
+     * Compress a file using LZW to filename.ll
      * 
      * @param fnm the file to compress
+     * @param stdOpen the open options. By default, option is set to CREATE
      * @throws IOException if an I/O error occurs
      */
-    public void compress(String fnm) throws IOException {
+    public void compress(String fnm, StandardOpenOption... stdOpen) throws IOException {
         try (Bin bin = new Bin(fnm);
-                Bout bout = new Bout(fnm + ".ll")) {
+                Bout bout = new Bout(fnm + ".ll", stdOpen)) {
             LZWAlgorithm(bin, bout);
         }
     }
@@ -62,11 +64,12 @@ public class SchubsL {
      * 
      * @param fnm the output filename
      * @param is  the input stream
+     * @param stdOpen the open options. By default, option is set to CREATE
      * @throws IOException if an I/O error occurs
      */
-    public void compress(String fnm, InputStream is) throws IOException {
+    public void compress(String fnm, InputStream is, StandardOpenOption... stdOpen) throws IOException {
         try (Bin bin = new Bin(is);
-                Bout bout = new Bout(fnm)) {
+                Bout bout = new Bout(fnm, stdOpen)) {
             LZWAlgorithm(bin, bout);
         }
     }
@@ -107,7 +110,7 @@ public class SchubsL {
 
             SchubsL schubsL = new SchubsL();
             for (String arg : args) {
-                schubsL.compress(arg);
+                schubsL.compress(arg, StandardOpenOption.CREATE_NEW);
             }
         } catch (IllegalArgumentException | IOException e) {
             System.err.println(e.getMessage());
@@ -117,9 +120,6 @@ public class SchubsL {
     private static void validateArgs(String[] args) {
         if (args.length == 0) {
             throw new IllegalArgumentException("Usage: java SchubsL <filename> | <GLOB>");
-        }
-        if (Files.exists(Path.of(args[0] + ".ll"))) {
-            throw new IllegalArgumentException(args[0] + ".ll already exists");
         }
         if (Files.isDirectory(Path.of(args[0]))) {
             throw new IllegalArgumentException("Input file is a directory. Use Glob instead: " +

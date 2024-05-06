@@ -18,6 +18,7 @@ import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 
 import org.junit.After;
 import org.junit.Before;
@@ -63,8 +64,8 @@ public class DeschubsTest {
         Files.write(blee, "Blee".getBytes());
         Files.write(blah, "Blah".getBytes());
 
-        new SchubsArc().compress(archive.toString(), blee.toString(), blah.toString());
-        new Deschubs().unarchive(archive.toString());
+        new SchubsArc().compress(archive.toString(), new String[] { blee.toString(), blah.toString() });
+        new Deschubs().unarchive(archive.toString(), StandardOpenOption.CREATE_NEW);
     }
 
     @Test(expected = RuntimeException.class)
@@ -72,6 +73,6 @@ public class DeschubsTest {
         Path archive = dir.resolve("BleeBlahBlue.zl");
         Files.write(archive, "Not proper archive format".getBytes());
 
-        new Deschubs().unarchive(archive.toString());
+        new Deschubs().unarchive(archive.toString(), StandardOpenOption.CREATE_NEW);
     }
 }

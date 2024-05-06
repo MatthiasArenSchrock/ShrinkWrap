@@ -18,7 +18,6 @@ import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -49,7 +48,7 @@ public class SchubsHTest {
     public void testHuffmanNormalOperation() throws IOException {
         String blee = "Blee\nBlah\nBlue";
         Path bleeText = dir.resolve("Blee.txt");
-        Files.write(bleeText, blee.getBytes(), StandardOpenOption.CREATE);
+        Files.write(bleeText, blee.getBytes());
 
         new SchubsH().compress(bleeText.toString());
 
@@ -63,7 +62,7 @@ public class SchubsHTest {
     @Test
     public void testHuffmanEmptyFile() throws IOException {
         Path blankText = dir.resolve("Blank.txt");
-        Files.write(blankText, new byte[0], StandardOpenOption.CREATE);
+        Files.write(blankText, new byte[0]);
 
         new SchubsH().compress(blankText.toString());
 
@@ -113,7 +112,7 @@ public class SchubsHTest {
         files.put(glob.resolve("Blue.txt"), "Blue");
 
         for (Map.Entry<Path, String> entry : files.entrySet()) {
-            Files.write(entry.getKey(), entry.getValue().getBytes(), StandardOpenOption.CREATE);
+            Files.write(entry.getKey(), entry.getValue().getBytes());
             Files.deleteIfExists(Paths.get(entry.getKey() + ".hh"));
         }
 
@@ -179,10 +178,11 @@ public class SchubsHTest {
     @Test
     public void testHuffmanFileAlreadyExists() throws IOException {
         Path blank = dir.resolve("Blank.txt");
-        Files.write(Path.of(blank + ".hh"), new byte[0], StandardOpenOption.CREATE);
+        Files.write(blank, new byte[0]);
+        Files.write(Path.of(blank + ".hh"), new byte[0]);
         SchubsH.main(new String[] { blank.toString() });
 
-        assertEquals(newErr.toString(), blank.toString() + ".hh already exists" + "\n");
+        assertEquals(newErr.toString(), blank.toString() + ".hh already exists. Try deleting or renaming it first." + "\n");
     }
 
     @Test

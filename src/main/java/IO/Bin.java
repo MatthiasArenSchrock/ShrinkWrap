@@ -21,10 +21,12 @@ import java.nio.file.Paths;
 /**
  * Read binary data from input stream
  *
- * <br><br>
+ * <br>
+ * <br>
  * "A wise person will hear and increase in learning,
  * And a person of understanding will acquire wise counsel"
  * (New American Standard Bible, 2020, Proverbs 1:5).
+ * 
  * @see AutoCloseable
  * @author Matthias Schrock
  */
@@ -35,6 +37,7 @@ public class Bin implements AutoCloseable {
 
     /**
      * Create a binary reader from a file
+     * 
      * @param s file name
      * @throws IOException if an I/O error occurs
      */
@@ -44,7 +47,8 @@ public class Bin implements AutoCloseable {
             bis = new BufferedInputStream(Files.newInputStream(path));
             fill();
         } catch (NoSuchFileException e) {
-            throw new NoSuchFileException("File not found: " + s);
+            throw new NoSuchFileException(s + "could not be found in the current directory." +
+                    " Check the name and path to the file before trying again.");
         } catch (IOException e) {
             throw new IOException("Error opening file " + s);
         }
@@ -52,6 +56,7 @@ public class Bin implements AutoCloseable {
 
     /**
      * Create a binary reader from an input stream
+     * 
      * @param is the input stream
      */
     public Bin(InputStream is) {
@@ -62,6 +67,7 @@ public class Bin implements AutoCloseable {
 
     /**
      * Fill the buffer with a byte from the input stream
+     * 
      * @throws IOException if an I/O error occurs
      */
     private void fill() throws IOException {
@@ -71,6 +77,7 @@ public class Bin implements AutoCloseable {
 
     /**
      * Check if the input stream is empty
+     * 
      * @return true if the input stream is empty, false otherwise
      */
     public boolean isEmpty() {
@@ -79,6 +86,7 @@ public class Bin implements AutoCloseable {
 
     /**
      * Check if the input stream is empty
+     * 
      * @throws IOException if an I/O error occurs
      */
     private void checkEmpty() throws IOException {
@@ -89,6 +97,7 @@ public class Bin implements AutoCloseable {
 
     /**
      * Read a string from the input stream
+     * 
      * @return string value
      * @throws IOException if an I/O error occurs
      */
@@ -103,6 +112,7 @@ public class Bin implements AutoCloseable {
 
     /**
      * Read all bytes from the input stream
+     * 
      * @return byte array
      * @throws IOException if an I/O error occurs
      */
@@ -112,6 +122,7 @@ public class Bin implements AutoCloseable {
 
     /**
      * Read a byte from the input stream
+     * 
      * @return byte value
      * @throws IOException if an I/O error occurs
      */
@@ -137,6 +148,7 @@ public class Bin implements AutoCloseable {
 
     /**
      * Read an integer from the input stream
+     * 
      * @return integer value
      * @throws IOException if an I/O error occurs
      */
@@ -152,9 +164,10 @@ public class Bin implements AutoCloseable {
 
     /**
      * Read r bits from input stream and return as an integer
+     * 
      * @param r number of bits to read
      * @return integer value
-     * @throws IOException if an I/O error occurs
+     * @throws IOException              if an I/O error occurs
      * @throws IllegalArgumentException if r is not between 1 and 32
      */
     public int readInt(int r) throws IOException {
@@ -179,6 +192,7 @@ public class Bin implements AutoCloseable {
 
     /**
      * Read a long from the input stream
+     * 
      * @return long value
      * @throws IOException if an I/O error occurs
      */
@@ -194,6 +208,7 @@ public class Bin implements AutoCloseable {
 
     /**
      * Read a bit/boolean from the input stream
+     * 
      * @return bit/boolean value
      * @throws IOException if an I/O error occurs
      */
@@ -210,6 +225,7 @@ public class Bin implements AutoCloseable {
 
     /**
      * Close the input stream
+     * 
      * @throws IOException if an I/O error occurs
      */
     @Override

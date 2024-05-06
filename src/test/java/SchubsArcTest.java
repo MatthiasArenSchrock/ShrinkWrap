@@ -57,7 +57,8 @@ public class SchubsArcTest {
         Files.write(blee, "Blee\nBlah\nBlue".getBytes());
 
         Files.deleteIfExists(arc);
-        SchubsArc.main(new String[] { dir.resolve("Blee").toString(), blee.toString() });
+        SchubsArc
+                .main(new String[] { blee.toString().substring(0, blee.toString().lastIndexOf('.')), blee.toString() });
         assertTrue(Files.exists(arc));
     }
 
@@ -67,14 +68,14 @@ public class SchubsArcTest {
         Path blankArc = dir.resolve("Blank.zl");
         Files.write(blankText, new byte[0]);
 
-        new SchubsArc().compress(blankArc.toString(), blankText.toString());
-        new Deschubs().deLZW(blankArc.toString());
+        new SchubsArc().compress(blankArc.toString(), new String[] { blankText.toString() });
+        new Deschubs().unarchive(blankArc.toString());
         checkFileContents(blankText, new byte[0]);
     }
 
     @Test(expected = IOException.class)
     public void testArcMissingFile() throws IOException {
-        new SchubsArc().compress(dir.resolve("Missing.zl").toString(), "Missing.txt");
+        new SchubsArc().compress(dir.resolve("Missing.zl").toString(), new String[] { "Missing.txt" });
     }
 
     @Test
@@ -86,7 +87,20 @@ public class SchubsArcTest {
 
         SchubsArc.main(new String[] { blankArc.toString(), blankText.toString() });
 
-        assertEquals(newErr.toString(), blankArc.toString() + " already exists. Use a unique name" + "\n");
+        assertEquals(newErr.toString(), blankArc.toString() + " already exists. Try deleting or renaming it first." + "\n");
+    }
+
+    @Test
+    public void testArcDoesNotClobber() throws IOException {
+        Path blee = dir.resolve("Blee.txt");
+        Path arc = dir.resolve("Blee.zl");
+        Files.write(blee, "Blee\nBlah\nBlue".getBytes());
+        Files.deleteIfExists(arc);
+
+        SchubsArc.main(new String[] { arc.toString(), blee.toString() });
+        Deschubs.main(new String[] { arc.toString() });
+
+        assertEquals(newErr.toString(), blee.toString() + " already exists. Try deleting or renaming it first." + "\n");
     }
 
     @Test
@@ -129,7 +143,7 @@ public class SchubsArcTest {
 
     @Test(expected = IOException.class)
     public void testArcInputFileIsDirectory() throws IOException {
-        new SchubsArc().compress(dir.resolve("Dir.zl").toString(), dir.toString());
+        new SchubsArc().compress(dir.resolve("Dir.zl").toString(), new String[] { dir.toString() });
     }
 
     @Test
@@ -153,10 +167,7 @@ public class SchubsArcTest {
         Files.write(d221, daniel221.getBytes());
         Files.write(d222, daniel222.getBytes());
 
-        new SchubsArc().compress(archive.toString(), d221.toString(), d222.toString());
-
-        Files.deleteIfExists(d221);
-        Files.deleteIfExists(d222);
+        new SchubsArc().compress(archive.toString(), new String[] { d221.toString(), d222.toString() });
         new Deschubs().unarchive(archive.toString());
 
         checkFileContents(d221, daniel221.getBytes());
@@ -169,9 +180,7 @@ public class SchubsArcTest {
         Path longWordPath = dir.resolve("LongWord.txt");
         Files.write(longWordPath, longWord.getBytes());
 
-        new SchubsArc().compress(dir.resolve("LongWord.zl").toString(), longWordPath.toString());
-
-        Files.deleteIfExists(longWordPath);
+        new SchubsArc().compress(dir.resolve("LongWord.zl").toString(), new String[] { longWordPath.toString() });
         new Deschubs().unarchive(dir.resolve("LongWord.zl").toString());
 
         checkFileContents(longWordPath, longWord.getBytes());
@@ -183,9 +192,7 @@ public class SchubsArcTest {
         Path lowercasePath = dir.resolve("Lowercase.txt");
         Files.write(lowercasePath, lowercase.getBytes());
 
-        new SchubsArc().compress(dir.resolve("Lowercase.zl").toString(), lowercasePath.toString());
-
-        Files.deleteIfExists(lowercasePath);
+        new SchubsArc().compress(dir.resolve("Lowercase.zl").toString(), new String[] { lowercasePath.toString() });
         new Deschubs().unarchive(dir.resolve("Lowercase.zl").toString());
 
         checkFileContents(lowercasePath, lowercase.getBytes());
@@ -197,9 +204,7 @@ public class SchubsArcTest {
         Path uppercasePath = dir.resolve("Uppercase.txt");
         Files.write(uppercasePath, uppercase.getBytes());
 
-        new SchubsArc().compress(dir.resolve("Uppercase.zl").toString(), uppercasePath.toString());
-
-        Files.deleteIfExists(uppercasePath);
+        new SchubsArc().compress(dir.resolve("Uppercase.zl").toString(), new String[] { uppercasePath.toString() });
         new Deschubs().unarchive(dir.resolve("Uppercase.zl").toString());
 
         checkFileContents(uppercasePath, uppercase.getBytes());

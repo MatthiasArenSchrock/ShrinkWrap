@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 
 import IO.Bin;
@@ -37,18 +38,19 @@ public class SchubsArc {
     private static final char sep = (char) (SchubsL.getR() - 1);
 
     /**
-     * Compress a set of input files into an LZW table archive
+     * Compress a set of input files into an LZW tape archive
      *
      * @param achv name of the archive
      * @param fnms list of files to be included in the archive
+     * @param stdOpen open options. By default, option is set to CREATE
      * @throws IOException if an I/O error occurs
      */
-    public void compress(String achv, String... fnms) throws IOException {
+    public void compress(String achv, String[] fnms, StandardOpenOption... stdOpen) throws IOException {
         SchubsL schubsL = new SchubsL();
 
         try (ByteArrayOutputStream tar = new ByteArrayOutputStream()) {
             tar(fnms).writeTo(tar);
-            schubsL.compress(achv, new ByteArrayInputStream(tar.toByteArray()));
+            schubsL.compress(achv, new ByteArrayInputStream(tar.toByteArray()), stdOpen);
         }
     }
 
@@ -113,7 +115,7 @@ public class SchubsArc {
         try {
             validateArgs(args);
 
-            new SchubsArc().compress(args[0], Arrays.copyOfRange(args, 1, args.length));
+            new SchubsArc().compress(args[0], Arrays.copyOfRange(args, 1, args.length), StandardOpenOption.CREATE_NEW);
         } catch (IllegalArgumentException | IOException e) {
             System.err.println(e.getMessage());
         }
@@ -125,9 +127,6 @@ public class SchubsArc {
         }
         if (!args[0].endsWith(".zl")) {
             args[0] += ".zl";
-        }
-        if (Files.exists(Path.of(args[0]))) {
-            throw new IllegalArgumentException(args[0] + " already exists. Use a unique name");
         }
     }
 }
