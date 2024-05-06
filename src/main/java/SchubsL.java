@@ -9,18 +9,17 @@
  *               GLOB CLI: java SchubsL <GLOB>
  */
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
 import DataStructures.TST;
 import IO.Bin;
 import IO.Bout;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.FileAlreadyExistsException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 /**
  * Compress one to many files using LZW encoding
@@ -98,22 +97,29 @@ public class SchubsL {
         bout.write(R, W);
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
+        try {
+            validateArgs(args);
+
+            SchubsL schubsL = new SchubsL();
+            for (String arg : args) {
+                schubsL.compress(arg);
+            }
+        } catch (IOException e) {
+            System.err.println(e.getMessage());
+        }
+    }
+
+    private static void validateArgs(String[] args) {
         if (args.length == 0) {
             throw new IllegalArgumentException("Usage: java SchubsL <filename> | <GLOB>");
         }
-
         if (Files.exists(Path.of(args[0] + ".ll"))) {
-            throw new FileAlreadyExistsException("File already exists: " + args[0] + ".ll");
+            throw new IllegalArgumentException(args[0] + ".ll already exists");
         }
         if (Files.isDirectory(Path.of(args[0]))) {
             throw new IllegalArgumentException("Input file is a directory. Use Glob instead: " +
-                    "java SchubsL " + args[0] + File.separator + "*<extension>");
-        }
-
-        SchubsL schubsL = new SchubsL();
-        for (String arg : args) {
-            schubsL.compress(arg);
+                    "java SchubsL " + args[0] + File.separator + "<glob>");
         }
     }
 }

@@ -9,9 +9,9 @@
  */
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
-import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -32,8 +32,19 @@ public class SchubsArcTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testArcWrongNumArgs() throws IOException {
+    public void testArcWrongNumArgs() {
         SchubsArc.main(new String[] {});
+    }
+
+    @Test
+    public void testArcFileExtension() throws IOException {
+        Path blee = dir.resolve("Blee.txt");
+        Path arc = dir.resolve("Blee.zl");
+        Files.write(blee, "Blee\nBlah\nBlue".getBytes());
+
+        Files.deleteIfExists(arc);
+        SchubsArc.main(new String[] { dir.resolve("Blee").toString(), blee.toString() });
+        assertTrue(Files.exists(arc));
     }
 
     @Test
@@ -52,7 +63,7 @@ public class SchubsArcTest {
         new SchubsArc().compress(dir.resolve("Missing.zl").toString(), "Missing.txt");
     }
 
-    @Test(expected = FileAlreadyExistsException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testArcAlreadyExists() throws IOException {
         Path blankText = dir.resolve("Blank.txt");
         Path blankArc = dir.resolve("Blank.zl");

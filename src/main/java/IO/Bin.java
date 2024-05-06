@@ -14,6 +14,7 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -38,9 +39,15 @@ public class Bin implements AutoCloseable {
      * @throws IOException if an I/O error occurs
      */
     public Bin(String s) throws IOException {
-        Path path = Paths.get(s);
-        bis = new BufferedInputStream(Files.newInputStream(path));
-        fill();
+        try {
+            Path path = Paths.get(s);
+            bis = new BufferedInputStream(Files.newInputStream(path));
+            fill();
+        } catch (NoSuchFileException e) {
+            throw new NoSuchFileException(s + " does not exist");
+        } catch (IOException e) {
+            throw new IOException("Error opening file " + s);
+        }
     }
 
     /**

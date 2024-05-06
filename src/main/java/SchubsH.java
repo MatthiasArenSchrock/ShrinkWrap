@@ -9,18 +9,17 @@
     *            GLOB CLI: java SchubsH <GLOB>
  */
 
-import DataStructures.TrieNode;
-import IO.Bin;
-import IO.Bout;
-import lombok.NoArgsConstructor;
-
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.PriorityQueue;
+
+import DataStructures.TrieNode;
+import IO.Bin;
+import IO.Bout;
+import lombok.NoArgsConstructor;
 
 /**
  * Compress one to many files using Huffman encoding
@@ -119,23 +118,29 @@ public class SchubsH {
         }
     }
 
-    public static void main(String[] args) throws IOException {
-//        args = new String[] { "test1.txt", "test2.txt" }; // For testing
+    public static void main(String[] args) {
+        try {
+            validateArgs(args);
+
+            SchubsH sh = new SchubsH();
+            for (String arg : args) {
+                sh.compress(arg);
+            }
+        } catch (IOException e) {
+            System.err.println(e.getMessage());
+        }
+    }
+
+    private static void validateArgs(String[] args) {
         if (args.length < 1) {
             throw new IllegalArgumentException("Usage: java SchubsH <filename> | <GLOB>");
         }
-
         if (Files.exists(Path.of(args[0] + ".hh"))) {
-            throw new FileAlreadyExistsException("File already exists: " + args[0] + ".hh");
+            throw new IllegalArgumentException("File already exists: " + args[0] + ".hh");
         }
         if (Files.isDirectory(Path.of(args[0]))) {
             throw new IllegalArgumentException("Input file is a directory. Use Glob instead: " +
-                    "java SchubsH " + args[0] + File.separator + "*<extension>");
-        }
-
-        SchubsH sh = new SchubsH();
-        for (String arg : args) {
-            sh.compress(arg);
+                    "java SchubsH " + args[0] + File.separator + "<glob>");
         }
     }
 }

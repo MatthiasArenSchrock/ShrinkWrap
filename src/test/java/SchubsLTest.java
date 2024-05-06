@@ -11,7 +11,6 @@
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
-import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
@@ -124,11 +123,11 @@ public class SchubsLTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testLZWWrongNumArgs() throws IOException {
+    public void testLZWWrongNumArgs() {
         SchubsL.main(new String[] {});
     }
 
-    @Test(expected = FileAlreadyExistsException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testLZWFileAlreadyExists() throws IOException {
         Path blank = dir.resolve("Blank.txt");
         Files.write(Path.of(blank + ".ll"), new byte[0], StandardOpenOption.CREATE);
@@ -136,7 +135,7 @@ public class SchubsLTest {
     }
     
     @Test(expected = IllegalArgumentException.class)
-    public void testLZWInputFileIsDirectory() throws IOException {
+    public void testLZWInputFileIsDirectory() {
         SchubsL.main(new String[] { dir.toString() });
     }
 

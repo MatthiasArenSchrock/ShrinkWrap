@@ -11,7 +11,6 @@
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
-import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
@@ -163,7 +162,7 @@ public class SchubsHTest {
         checkFileContents(uppercaseText, uppercase.getBytes());
     }
 
-    @Test(expected = FileAlreadyExistsException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testHuffmanFileAlreadyExists() throws IOException {
         Path blank = dir.resolve("Blank.txt");
         Files.write(Path.of(blank + ".hh"), new byte[0], StandardOpenOption.CREATE);

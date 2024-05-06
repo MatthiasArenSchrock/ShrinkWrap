@@ -8,19 +8,18 @@
  * Execute     : java SchubsArc <archive-name>.zl <file1> <[file2] [file3] ...>
  */
 
-import IO.Bin;
-import IO.Bout;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+
+import IO.Bin;
+import IO.Bout;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 /**
  * Create compressed and uncompressed tape archives
@@ -88,7 +87,7 @@ public class SchubsArc {
         if (!Files.isRegularFile(filePath)) {
             if (Files.isDirectory(filePath)) {
                 throw new IOException(filePath + " is a directory. Use glob instead: " + filePath +
-                        File.separator + "*<extension>");
+                        File.separator + "<glob>");
             }
             throw new IOException(filePath + " does not exist or cannot be accessed");
         }
@@ -109,19 +108,25 @@ public class SchubsArc {
         }
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
+        try {
+            validateArgs(args);
+
+            new SchubsArc().compress(args[0], Arrays.copyOfRange(args, 1, args.length));
+        } catch(IOException e) {
+            System.err.println(e.getMessage());
+        }
+    }
+
+    private static void validateArgs(String[] args) {
         if (args.length < 2) {
             throw new IllegalArgumentException("Usage: java SchubsArc <archive_name>.zl <[file1 file2 ...]>");
         }
-
         if (!args[0].endsWith(".zl")) {
             args[0] += ".zl";
         }
-
         if (Files.exists(Path.of(args[0]))) {
-            throw new FileAlreadyExistsException("Archive already exists: " + args[0]);
+            throw new IllegalArgumentException("Archive already exists: " + args[0]);
         }
-
-        new SchubsArc().compress(args[0], Arrays.copyOfRange(args, 1, args.length));
     }
 }

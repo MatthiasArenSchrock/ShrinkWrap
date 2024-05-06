@@ -9,17 +9,17 @@
  * Execute     : java Deschubs <filename>.hh|ll|zl
  */
 
-import DataStructures.TrieNode;
-import IO.Bin;
-import IO.Bout;
-import lombok.NoArgsConstructor;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+
+import DataStructures.TrieNode;
+import IO.Bin;
+import IO.Bout;
+import lombok.NoArgsConstructor;
 
 /**
  * Decompression class for LZW and Huffman encoded files as well as LZW compressed archives
@@ -223,14 +223,22 @@ public class Deschubs {
         }
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
+        try {
+            validateArgs(args);
+
+            Deschubs deschubs = new Deschubs();
+            for (String fnm : args) {
+                deschubs.decompress(fnm);
+            }
+        } catch (IOException e) {
+            System.err.println(e.getMessage());
+        }
+    }
+
+    private static void validateArgs(String[] args) {
         if (args.length < 1) {
             throw new IllegalArgumentException("Usage: java Deschubs <filename>.hh|ll|zl | <GLOB>");
-        }
-
-        Deschubs deschubs = new Deschubs();
-        for (String fnm : args) {
-            deschubs.decompress(fnm);
         }
     }
 }

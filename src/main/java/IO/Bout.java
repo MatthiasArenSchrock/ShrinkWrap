@@ -15,6 +15,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
 
 /**
@@ -38,7 +39,14 @@ public class Bout implements AutoCloseable {
      * @throws IOException if an I/O error occurs
      */
     public Bout(String s) throws IOException {
-        bos = new BufferedOutputStream(Files.newOutputStream(Paths.get(s)));
+        try {
+            bos = new BufferedOutputStream(Files.newOutputStream(Paths.get(s)));
+        } catch (NoSuchFileException e) {
+            throw new NoSuchFileException(s + " does not exist");
+        } catch (IOException e) {
+            throw new IOException("Error opening file " + s);
+        }
+
         buf = 0;
         n = 0;
     }
