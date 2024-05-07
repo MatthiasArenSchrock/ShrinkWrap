@@ -1,4 +1,4 @@
-# ShrinkWrap
+# ShrinkWrap - CS375 - Software Engineering II
 
 ## Design
 
