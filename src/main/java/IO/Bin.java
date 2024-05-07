@@ -47,7 +47,7 @@ public class Bin implements AutoCloseable {
             bis = new BufferedInputStream(Files.newInputStream(path));
             fill();
         } catch (NoSuchFileException e) {
-            throw new NoSuchFileException(s + "could not be found in the current directory." +
+            throw new NoSuchFileException(s + " could not be found." +
                     " Check the name and path to the file before trying again.");
         } catch (IOException e) {
             throw new IOException("Error opening file " + s);
