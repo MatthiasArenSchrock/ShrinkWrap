@@ -34,10 +34,9 @@ LZW also has the advantage over huffman of not having to embed a trie at the hea
 
 #### Trade-offs
 The LZW algorithm used in SchubsArc has several trade-offs:  
-Memory usage: The LZW algorithm uses a dictionary that grows with the input, which can lead to high memory usage for large inputs or long-running compressions.  
-Compression ratio: The LZW algorithm can achieve high compression ratios on certain types of data, but it may not compress small or non-repetitive data well.  
-Complexity: The LZW algorithm is more complex than some other compression algorithms, such as Huffman coding. This can make it slower and more resource-intensive to encode and decode data.  
-Patent issues: The LZW algorithm was previously patented, which led to restrictions on its use. Although the patents have now expired, they led to the development and widespread adoption of other compression algorithms.
+- Memory usage: The LZW algorithm uses a dictionary that grows with the input, which can lead to high memory usage for large inputs or long-running compressions.  
+- Compression ratio: The LZW algorithm can achieve high compression ratios on certain types of data, but it may not compress small or non-repetitive data well.  
+- Complexity: The LZW algorithm is more complex than some other compression algorithms, such as Huffman coding. This can make it slower and more resource-intensive to encode and decode data.
 
 ## Tests
 Tests comprehensively cover data compression algorithm implementations and the IO and data structure classes they use. The general strategy is to test various file contents and length, compressing and decompressing to ensure that the algorithms are deterministic and compressed data is fully retrievable. Tests also cover edge cases that result from improper or unexpected commands or existing files to prevent overwriting data. Coverage is measured using the Jacoco plugin.
@@ -69,6 +68,8 @@ See [Test Instructions](#test-instructions) for details on running tests and gen
 ### Run
 Assuming Java JDK 20+ is installed and the project has been built using `mvn compile` or all individual class files have been compiled using `javac` and are structured properly:
 <br>`java -cp [<relative path to project directory>/]target/classes SchubsH | SchubsL | SchubsArc | Deschubs <args>`
+<br>[See Examples](#run-examples)
+<br><I>Note: the class path is assumed in run examples</I>
 
 ## Test Instructions
 maven command: `mvn test`
